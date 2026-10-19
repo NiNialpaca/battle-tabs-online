@@ -90,6 +90,16 @@ function handleMessage(msg){
     return;
   }
 
+  if(msg.type === "ship_sunk"){
+    showSunkModal(msg.title || "戰艦被擊沉！", msg.message || "");
+    return;
+  }
+
+  if(msg.type === "game_over"){
+    showResultOverlay(msg.you_won);
+    return;
+  }
+
   if(msg.type === "state"){
     latestState = msg.state;
     if(msg.state.phase === "setup"){
@@ -103,9 +113,7 @@ function handleMessage(msg){
       renderBattle();
     }
     if(msg.state.phase === "finished"){
-      showScreen("gameOver");
-      document.getElementById("winnerText").textContent =
-        msg.state.you_won ? "你贏了！" : "你輸了";
+      showResultOverlay(msg.state.you_won);
     }
     return;
   }
@@ -286,3 +294,31 @@ function onEnemyClick(row,col){
 }
 
 document.getElementById("backLobbyBtn").onclick=()=>location.reload();
+
+
+function showSunkModal(title, message){
+  const modal = document.getElementById("sunkModal");
+  document.getElementById("sunkModalTitle").textContent = title;
+  document.getElementById("sunkModalText").textContent = message;
+  modal.classList.remove("hidden");
+}
+
+document.getElementById("closeSunkModalBtn").onclick = () => {
+  document.getElementById("sunkModal").classList.add("hidden");
+};
+
+function showResultOverlay(youWon){
+  const overlay = document.getElementById("resultOverlay");
+  const word = document.getElementById("resultWord");
+  const sub = document.getElementById("resultSubtext");
+
+  word.textContent = youWon ? "WIN" : "LOSE";
+  word.className = "result-word " + (youWon ? "win" : "lose");
+  sub.textContent = youWon
+    ? "你擊沉了敵方全部戰艦"
+    : "你的艦隊已全數被擊沉";
+
+  overlay.classList.remove("hidden");
+}
+
+document.getElementById("resultBackBtn").onclick = () => location.reload();
