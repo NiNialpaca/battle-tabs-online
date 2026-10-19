@@ -83,8 +83,55 @@ def hydrate_ships(ships):
         })
     return result
 
+def refresh_sunk_status(player):
+    """Always recompute sunk status from hit cells so win detection cannot go stale."""
+    for ship in player["ships"]:
+        ship["sunk"] = len(set(ship["hits"])) >= len(ship["cells"])
+
 def all_sunk(player):
-    return all(s["sunk"] for s in player["ships"])
+    refresh_sunk_status(player)
+    return bool(player["ships"]) and all(s["sunk"] for s in player["ships"])
+
+async def notify_sunk(room, attacker_index, ship_names):
+    if not ship_names:
+        return
+
+    attacker = room["players"][attacker_index]
+    defender = room["players"][1-attacker_index]
+
+    for ship_name in ship_names:
+        try:
+            await attacker["ws"].send_json({
+                "type": "ship_sunk",
+                "title": "擊沉戰艦！",
+                "message": f"你擊沉了對方的 {ship_name}"
+            })
+        except:
+            pass
+
+        try:
+            await defender["ws"].send_json({
+                "type": "ship_sunk",
+                "title": "戰艦被擊沉！",
+                "message": f"你的 {ship_name} 被擊沉了"
+            })
+        except:
+            pass
+
+async def finish_game(room, winner_index, message=""):
+    room["phase"] = "finished"
+    room["winner"] = winner_index
+
+    for i, p in enumerate(room["players"]):
+        try:
+            await p["ws"].send_json({
+                "type": "game_over",
+                "you_won": i == winner_index
+            })
+        except:
+            pass
+
+    await broadcast_state(room, message)
 
 def public_state(room, viewer_index, message=None):
     me = room["players"][viewer_index]
@@ -129,7 +176,7 @@ def decrement_cooldowns(player):
 def attack_cell(enemy, row, col):
     k=f"{row},{col}"
     if k in enemy["attacks_received"]:
-        return False, "這格已經攻擊過了。"
+        return False, "這格已經攻擊過了。", None
 
     target_ship = None
     for s in enemy["ships"]:
@@ -139,7 +186,7 @@ def attack_cell(enemy, row, col):
 
     if not target_ship:
         enemy["attacks_received"][k]="miss"
-        return True, "MISS！沒有命中。"
+        return True, "MISS！沒有命中。", None
 
     if enemy["shield_active"]:
         options=[(row-1,col),(row+1,col),(row,col-1),(row,col+1)]
@@ -148,25 +195,32 @@ def attack_cell(enemy, row, col):
         if options:
             r,c=random.choice(options)
             enemy["attacks_received"][f"{r},{c}"]="miss"
-            return True, "攻擊被護盾偏移！"
+            return True, "攻擊被護盾偏移！", None
 
     enemy["attacks_received"][k]="hit"
     if k not in target_ship["hits"]:
         target_ship["hits"].append(k)
-    if len(target_ship["hits"]) == len(target_ship["cells"]):
-        target_ship["sunk"]=True
-        return True, f"擊沉 {SHIP_DEFS[target_ship['id']]['name']}！"
-    return True, "HIT！命中敵艦。"
+
+    was_sunk = target_ship["sunk"]
+    refresh_sunk_status(enemy)
+
+    if target_ship["sunk"] and not was_sunk:
+        ship_name = SHIP_DEFS[target_ship["id"]]["name"]
+        return True, f"擊沉 {ship_name}！", ship_name
+
+    return True, "HIT！命中敵艦。", None
 
 async def end_turn(room, acting_index, message):
     actor=room["players"][acting_index]
-    decrement_cooldowns(actor)
     enemy=room["players"][1-acting_index]
+
+    refresh_sunk_status(enemy)
+
     if all_sunk(enemy):
-        room["phase"]="finished"
-        room["winner"]=acting_index
-        await broadcast_state(room, message)
+        await finish_game(room, acting_index, message)
         return
+
+    decrement_cooldowns(actor)
     room["turn"]=1-acting_index
     await broadcast_state(room, message)
 
@@ -247,10 +301,12 @@ async def websocket_endpoint(ws: WebSocket):
                 if not isinstance(row,int) or not isinstance(col,int) or not (0<=row<BOARD_SIZE and 0<=col<BOARD_SIZE):
                     await ws.send_json({"type":"error","message":"無效格子。"})
                     continue
-                ok,text=attack_cell(enemy,row,col)
+                ok,text,sunk_name=attack_cell(enemy,row,col)
                 if not ok:
                     await ws.send_json({"type":"error","message":text})
                     continue
+                if sunk_name:
+                    await notify_sunk(room, idx, [sunk_name])
                 await end_turn(room,idx,text)
                 continue
 
@@ -292,16 +348,24 @@ async def websocket_endpoint(ws: WebSocket):
                 if skill=="missile":
                     targets=[(row,col),(row-1,col),(row+1,col),(row,col-1),(row,col+1)]
                     hits=0
+                    sunk_names=[]
                     for r,c in targets:
                         if 0<=r<BOARD_SIZE and 0<=c<BOARD_SIZE:
                             k=f"{r},{c}"
                             if k in enemy["attacks_received"]:
                                 continue
                             target_ship=next((s for s in enemy["ships"] if k in s["cells"]),None)
-                            ok,_=attack_cell(enemy,r,c)
+                            ok,_,sunk_name=attack_cell(enemy,r,c)
                             if target_ship and ok:
                                 hits+=1
+                            if sunk_name and sunk_name not in sunk_names:
+                                sunk_names.append(sunk_name)
+
                     ship["cooldown_remaining"]=ship["cooldown"]
+
+                    if sunk_names:
+                        await notify_sunk(room, idx, sunk_names)
+
                     await end_turn(room,idx,f"飛彈掃射完成，共命中 {hits} 格。")
                     continue
 
