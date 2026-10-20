@@ -1890,21 +1890,22 @@ document
 // WIN / LOSE
 // ======================================================
 
-function showResultOverlay(
-  youWon
-) {
+function showResultOverlay(youWon) {
+
+  console.log(
+    "[DEBUG GAME OVER FRONTEND]",
+    youWon
+  );
 
   const overlay =
     document.getElementById(
       "resultOverlay"
     );
 
-
   const word =
     document.getElementById(
       "resultWord"
     );
-
 
   const subtext =
     document.getElementById(
@@ -1912,38 +1913,94 @@ function showResultOverlay(
     );
 
 
-  if (youWon) {
+  // =========================================
+  // 如果新版 WIN / LOSE overlay 存在
+  // =========================================
 
-    word.textContent =
-      "WIN";
+  if (
+    overlay
+    &&
+    word
+    &&
+    subtext
+  ) {
+
+    if (youWon) {
+
+      word.textContent =
+        "WIN";
+
+      word.className =
+        "result-word win";
+
+      subtext.textContent =
+        "你擊沉了敵方全部戰艦";
+
+    } else {
+
+      word.textContent =
+        "LOSE";
+
+      word.className =
+        "result-word lose";
+
+      subtext.textContent =
+        "你的艦隊已全數被擊沉";
+    }
 
 
-    word.className =
-      "result-word win";
+    overlay.classList.remove(
+      "hidden"
+    );
 
-
-    subtext.textContent =
-      "你擊沉了敵方全部戰艦";
+    return;
   }
 
 
-  else {
+  // =========================================
+  // 保險方案：
+  // 如果 overlay HTML 不存在
+  // 就使用原本 gameOverScreen
+  // =========================================
 
-    word.textContent =
-      "LOSE";
+  const gameOverScreen =
+    document.getElementById(
+      "gameOverScreen"
+    );
+
+  const winnerText =
+    document.getElementById(
+      "winnerText"
+    );
 
 
-    word.className =
-      "result-word lose";
+  if (
+    gameOverScreen
+    &&
+    winnerText
+  ) {
 
+    showScreen(
+      "gameOver"
+    );
 
-    subtext.textContent =
-      "你的艦隊已全數被擊沉";
+    winnerText.textContent =
+      youWon
+        ? "WIN！你贏了！"
+        : "LOSE！你輸了！";
+
+    return;
   }
 
 
-  overlay.classList.remove(
-    "hidden"
+  // =========================================
+  // 最後一道保險
+  // =========================================
+
+  alert(
+    youWon
+      ? "WIN！你贏了！"
+      : "LOSE！你輸了！"
   );
 }
 
