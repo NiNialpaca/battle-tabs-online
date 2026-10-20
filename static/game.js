@@ -33,35 +33,23 @@ const BOARD_SIZE = 10;
 
 
 // ======================================================
-// 遊戲狀態
+// 全域狀態
 // ======================================================
 
 let socket = null;
 
 let roomCode = null;
-
 let playerId = null;
-
 let playerIndex = null;
 
-
-// 部署
 let setupShips = [];
-
 let setupShipIndex = 0;
-
 let direction = "horizontal";
 
-
-// 戰鬥
 let latestState = null;
-
 let selectedSkill = null;
 
-
-// 重新連線
 let reconnectTimer = null;
-
 let intentionalClose = false;
 
 
@@ -70,33 +58,30 @@ let intentionalClose = false;
 // ======================================================
 
 const screens = {
-  lobby:
-    document.getElementById("lobbyScreen"),
-
-  waiting:
-    document.getElementById("waitingScreen"),
-
-  setup:
-    document.getElementById("setupScreen"),
-
-  battle:
-    document.getElementById("battleScreen"),
-
-  gameOver:
-    document.getElementById("gameOverScreen")
+  lobby: document.getElementById("lobbyScreen"),
+  waiting: document.getElementById("waitingScreen"),
+  setup: document.getElementById("setupScreen"),
+  battle: document.getElementById("battleScreen"),
+  gameOver: document.getElementById("gameOverScreen")
 };
 
 
 function showScreen(name) {
 
-  Object.values(screens).forEach(
-    screen =>
-      screen.classList.add("hidden")
-  );
+  Object.values(screens).forEach(screen => {
 
-  screens[name].classList.remove(
-    "hidden"
-  );
+    if (screen) {
+      screen.classList.add("hidden");
+    }
+
+  });
+
+
+  if (screens[name]) {
+
+    screens[name].classList.remove("hidden");
+
+  }
 }
 
 
@@ -111,13 +96,16 @@ function wsUrl() {
       ? "wss"
       : "ws";
 
-  return (
-    `${protocol}://${location.host}/ws`
-  );
+  return `${protocol}://${location.host}/ws`;
 }
 
 
 function connectSocket(onOpen) {
+
+  console.log(
+    "[WS] connecting..."
+  );
+
 
   socket = new WebSocket(
     wsUrl()
@@ -125,6 +113,11 @@ function connectSocket(onOpen) {
 
 
   socket.onopen = () => {
+
+    console.log(
+      "[WS] connected"
+    );
+
 
     if (reconnectTimer) {
 
@@ -145,10 +138,31 @@ function connectSocket(onOpen) {
 
   socket.onmessage = event => {
 
-    const msg =
-      JSON.parse(
-        event.data
+    console.log(
+      "[WS RECEIVE]",
+      event.data
+    );
+
+
+    let msg;
+
+    try {
+
+      msg =
+        JSON.parse(
+          event.data
+        );
+
+    } catch (error) {
+
+      console.error(
+        "[WS JSON ERROR]",
+        error
       );
+
+      return;
+    }
+
 
     handleMessage(
       msg
@@ -156,7 +170,14 @@ function connectSocket(onOpen) {
   };
 
 
-  socket.onclose = () => {
+  socket.onclose = event => {
+
+    console.log(
+      "[WS CLOSED]",
+      event.code,
+      event.reason
+    );
+
 
     if (intentionalClose) {
 
@@ -164,7 +185,6 @@ function connectSocket(onOpen) {
     }
 
 
-    // 還沒進房間
     if (
       !roomCode
       ||
@@ -176,11 +196,13 @@ function connectSocket(onOpen) {
           "lobbyStatus"
         );
 
+
       if (status) {
 
         status.textContent =
           "連線中斷，請重新連線。";
       }
+
 
       return;
     }
@@ -190,10 +212,11 @@ function connectSocket(onOpen) {
   };
 
 
-  socket.onerror = () => {
+  socket.onerror = error => {
 
-    console.log(
-      "WebSocket error"
+    console.error(
+      "[WS ERROR]",
+      error
     );
   };
 }
@@ -204,6 +227,11 @@ function connectSocket(onOpen) {
 // ======================================================
 
 function scheduleReconnect() {
+
+  console.log(
+    "[WS] schedule reconnect"
+  );
+
 
   const status =
     document.getElementById(
@@ -218,7 +246,6 @@ function scheduleReconnect() {
   }
 
 
-  // 已經在等重連
   if (reconnectTimer) {
 
     return;
@@ -235,34 +262,42 @@ function scheduleReconnect() {
         connectSocket(
           () => {
 
+            console.log(
+              "[WS] trying resume_room"
+            );
+
+
             send(
               "resume_room",
               {
-                room_code:
-                  roomCode,
-
-                player_id:
-                  playerId
+                room_code: roomCode,
+                player_id: playerId
               }
             );
           }
         );
 
       },
-
       1000
     );
 }
 
 
 // ======================================================
-// 傳訊息
+// 傳送資料
 // ======================================================
 
 function send(
   type,
   payload = {}
 ) {
+
+  console.log(
+    "[WS SEND]",
+    type,
+    payload
+  );
+
 
   if (
     socket
@@ -279,11 +314,16 @@ function send(
       })
     );
 
+
     return true;
   }
 
 
-  // 遊戲中斷線
+  console.warn(
+    "[WS SEND FAILED] socket not open"
+  );
+
+
   if (
     roomCode
     &&
@@ -291,13 +331,13 @@ function send(
   ) {
 
     scheduleReconnect();
-  }
 
-  else {
+  } else {
 
     alert(
       "目前沒有連上遊戲伺服器，請重新整理頁面。"
     );
+
   }
 
 
@@ -309,18 +349,27 @@ function send(
 // 建立房間
 // ======================================================
 
-document
-  .getElementById(
+const createRoomBtn =
+  document.getElementById(
     "createRoomBtn"
-  )
-  .onclick = () => {
+  );
 
-    document
-      .getElementById(
+
+if (createRoomBtn) {
+
+  createRoomBtn.onclick = () => {
+
+    const lobbyStatus =
+      document.getElementById(
         "lobbyStatus"
-      )
-      .textContent =
+      );
+
+
+    if (lobbyStatus) {
+
+      lobbyStatus.textContent =
         "建立房間中...";
+    }
 
 
     connectSocket(
@@ -329,26 +378,36 @@ document
         send(
           "create_room"
         );
+
       }
     );
+
   };
+}
 
 
 // ======================================================
 // 加入房間
 // ======================================================
 
-document
-  .getElementById(
+const joinRoomBtn =
+  document.getElementById(
     "joinRoomBtn"
-  )
-  .onclick = () => {
+  );
+
+
+if (joinRoomBtn) {
+
+  joinRoomBtn.onclick = () => {
+
+    const input =
+      document.getElementById(
+        "roomCodeInput"
+      );
+
 
     const code =
-      document
-        .getElementById(
-          "roomCodeInput"
-        )
+      input
         .value
         .trim()
         .toUpperCase();
@@ -358,23 +417,34 @@ document
       code.length !== 4
     ) {
 
-      document
-        .getElementById(
+      const lobbyStatus =
+        document.getElementById(
           "lobbyStatus"
-        )
-        .textContent =
+        );
+
+
+      if (lobbyStatus) {
+
+        lobbyStatus.textContent =
           "請輸入 4 碼房間代碼。";
+      }
+
 
       return;
     }
 
 
-    document
-      .getElementById(
+    const lobbyStatus =
+      document.getElementById(
         "lobbyStatus"
-      )
-      .textContent =
+      );
+
+
+    if (lobbyStatus) {
+
+      lobbyStatus.textContent =
         "加入房間中...";
+    }
 
 
     connectSocket(
@@ -383,20 +453,27 @@ document
         send(
           "join_room",
           {
-            room_code:
-              code
+            room_code: code
           }
         );
+
       }
     );
+
   };
+}
 
 
 // ======================================================
-// 處理 Server 訊息
+// Server 訊息
 // ======================================================
 
 function handleMessage(msg) {
+
+  console.log(
+    "[HANDLE MESSAGE]",
+    msg
+  );
 
 
   // ====================================================
@@ -418,17 +495,23 @@ function handleMessage(msg) {
       msg.player_index;
 
 
-    document
-      .getElementById(
+    const roomCodeDisplay =
+      document.getElementById(
         "roomCodeDisplay"
-      )
-      .textContent =
+      );
+
+
+    if (roomCodeDisplay) {
+
+      roomCodeDisplay.textContent =
         roomCode;
+    }
 
 
     showScreen(
       "waiting"
     );
+
 
     return;
   }
@@ -475,13 +558,19 @@ function handleMessage(msg) {
 
 
   // ====================================================
-  // 自動重連成功
+  // 重連成功
   // ====================================================
 
   if (
     msg.type ===
     "room_resumed"
   ) {
+
+    console.log(
+      "[ROOM RESUMED]",
+      msg
+    );
+
 
     roomCode =
       msg.room_code;
@@ -512,6 +601,7 @@ function handleMessage(msg) {
           "statusText"
         );
 
+
       if (status) {
 
         status.textContent =
@@ -520,10 +610,8 @@ function handleMessage(msg) {
 
 
       renderBattle();
-    }
 
-
-    else if (
+    } else if (
       latestState.phase
       ===
       "finished"
@@ -532,10 +620,8 @@ function handleMessage(msg) {
       showResultOverlay(
         latestState.you_won
       );
-    }
 
-
-    else if (
+    } else if (
       latestState.phase
       ===
       "setup"
@@ -544,6 +630,7 @@ function handleMessage(msg) {
       showScreen(
         "setup"
       );
+
     }
 
 
@@ -552,7 +639,7 @@ function handleMessage(msg) {
 
 
   // ====================================================
-  // 對手連線狀態
+  // 對手斷線 / 重連訊息
   // ====================================================
 
   if (
@@ -571,7 +658,7 @@ function handleMessage(msg) {
       status.textContent =
         msg.message
         ||
-        "對手暫時斷線";
+        "對手連線狀態改變";
     }
 
 
@@ -588,6 +675,12 @@ function handleMessage(msg) {
     "ship_sunk"
   ) {
 
+    console.log(
+      "[SHIP SUNK]",
+      msg
+    );
+
+
     showSunkModal(
       msg.title
       ||
@@ -598,12 +691,13 @@ function handleMessage(msg) {
       ""
     );
 
+
     return;
   }
 
 
   // ====================================================
-  // WIN / LOSE
+  // GAME OVER
   // ====================================================
 
   if (
@@ -611,9 +705,16 @@ function handleMessage(msg) {
     "game_over"
   ) {
 
+    console.log(
+      "[GAME OVER RECEIVED]",
+      msg
+    );
+
+
     showResultOverlay(
       msg.you_won
     );
+
 
     return;
   }
@@ -632,9 +733,15 @@ function handleMessage(msg) {
       msg.state;
 
 
-    // -------------------------
+    console.log(
+      "[STATE UPDATE]",
+      latestState
+    );
+
+
+    // -----------------------
     // Setup
-    // -------------------------
+    // -----------------------
 
     if (
       msg.state.phase
@@ -642,7 +749,15 @@ function handleMessage(msg) {
       "setup"
     ) {
 
+      const setupStatus =
+        document.getElementById(
+          "setupStatus"
+        );
+
+
       if (
+        setupStatus
+        &&
         !screens.setup
           .classList
           .contains(
@@ -650,23 +765,19 @@ function handleMessage(msg) {
           )
       ) {
 
-        document
-          .getElementById(
-            "setupStatus"
-          )
-          .textContent =
-            msg.state.both_ready
-              ?
-              "雙方已準備完成"
-              :
-              "等待雙方完成部署";
+        setupStatus.textContent =
+          msg.state.both_ready
+            ?
+            "雙方已準備完成"
+            :
+            "等待雙方完成部署";
       }
     }
 
 
-    // -------------------------
+    // -----------------------
     // Battle
-    // -------------------------
+    // -----------------------
 
     if (
       msg.state.phase
@@ -682,15 +793,21 @@ function handleMessage(msg) {
     }
 
 
-    // -------------------------
+    // -----------------------
     // Finished
-    // -------------------------
+    // -----------------------
 
     if (
       msg.state.phase
       ===
       "finished"
     ) {
+
+      console.log(
+        "[STATE FINISHED]",
+        msg.state
+      );
+
 
       showResultOverlay(
         msg.state.you_won
@@ -711,15 +828,19 @@ function handleMessage(msg) {
     "error"
   ) {
 
+    console.error(
+      "[SERVER ERROR]",
+      msg.message
+    );
+
+
     const lobbyStatus =
       document.getElementById(
         "lobbyStatus"
       );
 
 
-    if (
-      lobbyStatus
-    ) {
+    if (lobbyStatus) {
 
       lobbyStatus.textContent =
         msg.message;
@@ -730,13 +851,14 @@ function handleMessage(msg) {
       msg.message
     );
 
+
     return;
   }
 }
 
 
 // ======================================================
-// 開始部署
+// 部署
 // ======================================================
 
 function beginSetup() {
@@ -746,26 +868,34 @@ function beginSetup() {
   );
 
 
-  document
-    .getElementById(
+  const roomCodeTop =
+    document.getElementById(
       "roomCodeTop"
-    )
-    .textContent =
+    );
+
+
+  if (roomCodeTop) {
+
+    roomCodeTop.textContent =
       roomCode;
+  }
 
 
-  document
-    .getElementById(
+  const playerLabel =
+    document.getElementById(
       "playerLabel"
-    )
-    .textContent =
+    );
+
+
+  if (playerLabel) {
+
+    playerLabel.textContent =
       `玩家 ${playerIndex + 1}`;
+  }
 
 
   setupShips = [];
-
   setupShipIndex = 0;
-
   direction = "horizontal";
 
 
@@ -774,7 +904,7 @@ function beginSetup() {
 
 
 // ======================================================
-// Board 工具
+// 棋盤工具
 // ======================================================
 
 function key(
@@ -782,9 +912,7 @@ function key(
   col
 ) {
 
-  return (
-    `${row},${col}`
-  );
+  return `${row},${col}`;
 }
 
 
@@ -809,6 +937,12 @@ function renderBoard(
   container,
   onClick
 ) {
+
+  if (!container) {
+
+    return;
+  }
+
 
   container.innerHTML =
     "";
@@ -839,7 +973,6 @@ function renderBoard(
       cell.dataset.row =
         row;
 
-
       cell.dataset.col =
         col;
 
@@ -847,11 +980,20 @@ function renderBoard(
       if (onClick) {
 
         cell.onclick =
-          () =>
+          () => {
+
+            console.log(
+              "[CELL CLICK]",
+              row,
+              col
+            );
+
+
             onClick(
               row,
               col
             );
+          };
       }
 
 
@@ -864,7 +1006,7 @@ function renderBoard(
 
 
 // ======================================================
-// 計算船的位置
+// 船格計算
 // ======================================================
 
 function getShipCells(
@@ -962,7 +1104,6 @@ function renderSetup() {
           Number(
             cell.dataset.row
           ),
-
           Number(
             cell.dataset.col
           )
@@ -983,14 +1124,16 @@ function renderSetup() {
   );
 
 
-  // ------------------------
-  // 艦隊列表
-  // ------------------------
-
   const list =
     document.getElementById(
       "shipList"
     );
+
+
+  if (!list) {
+
+    return;
+  }
 
 
   list.innerHTML =
@@ -1035,10 +1178,7 @@ function renderSetup() {
 
 
       card.innerHTML = `
-        <strong>
-          ${ship.name}
-        </strong>
-
+        <strong>${ship.name}</strong>
         <span>
           長度 ${ship.size}
           ｜${ship.description}
@@ -1053,19 +1193,24 @@ function renderSetup() {
   );
 
 
-  document
-    .getElementById(
+  const confirmSetupBtn =
+    document.getElementById(
       "confirmSetupBtn"
-    )
-    .disabled =
+    );
+
+
+  if (confirmSetupBtn) {
+
+    confirmSetupBtn.disabled =
       setupShipIndex
       <
       SHIP_TYPES.length;
+  }
 }
 
 
 // ======================================================
-// 放置戰艦
+// 放船
 // ======================================================
 
 function tryPlaceShip(
@@ -1134,9 +1279,7 @@ function tryPlaceShip(
 
 
   setupShips.push({
-    id:
-      shipType.id,
-
+    id: shipType.id,
     cells
   });
 
@@ -1149,115 +1292,137 @@ function tryPlaceShip(
 
 
 // ======================================================
-// 水平
+// 方向按鈕
 // ======================================================
 
-document
-  .getElementById(
+const horizontalBtn =
+  document.getElementById(
     "horizontalBtn"
-  )
-  .onclick = () => {
+  );
+
+
+if (horizontalBtn) {
+
+  horizontalBtn.onclick = () => {
 
     direction =
       "horizontal";
 
 
-    document
-      .getElementById(
-        "horizontalBtn"
-      )
-      .classList.add(
-        "active"
-      );
+    horizontalBtn.classList.add(
+      "active"
+    );
 
 
-    document
-      .getElementById(
+    const verticalBtn =
+      document.getElementById(
         "verticalBtn"
-      )
-      .classList.remove(
+      );
+
+
+    if (verticalBtn) {
+
+      verticalBtn.classList.remove(
         "active"
       );
+    }
   };
+}
 
 
-// ======================================================
-// 垂直
-// ======================================================
-
-document
-  .getElementById(
+const verticalBtn =
+  document.getElementById(
     "verticalBtn"
-  )
-  .onclick = () => {
+  );
+
+
+if (verticalBtn) {
+
+  verticalBtn.onclick = () => {
 
     direction =
       "vertical";
 
 
-    document
-      .getElementById(
-        "verticalBtn"
-      )
-      .classList.add(
-        "active"
-      );
+    verticalBtn.classList.add(
+      "active"
+    );
 
 
-    document
-      .getElementById(
+    const horizontalBtn =
+      document.getElementById(
         "horizontalBtn"
-      )
-      .classList.remove(
+      );
+
+
+    if (horizontalBtn) {
+
+      horizontalBtn.classList.remove(
         "active"
       );
+    }
   };
+}
 
 
 // ======================================================
 // 完成部署
 // ======================================================
 
-document
-  .getElementById(
+const confirmSetupBtn =
+  document.getElementById(
     "confirmSetupBtn"
-  )
-  .onclick = () => {
+  );
 
-    send(
-      "submit_setup",
-      {
-        room_code:
-          roomCode,
 
-        player_id:
-          playerId,
+if (confirmSetupBtn) {
 
-        ships:
-          setupShips
+  confirmSetupBtn.onclick =
+    () => {
+
+      const sent =
+        send(
+          "submit_setup",
+          {
+            room_code:
+              roomCode,
+
+            player_id:
+              playerId,
+
+            ships:
+              setupShips
+          }
+        );
+
+
+      if (!sent) {
+
+        return;
       }
-    );
 
 
-    document
-      .getElementById(
-        "confirmSetupBtn"
-      )
-      .disabled =
+      confirmSetupBtn.disabled =
         true;
 
 
-    document
-      .getElementById(
-        "setupStatus"
-      )
-      .textContent =
-        "已送出部署，等待對手...";
-  };
+      const setupStatus =
+        document.getElementById(
+          "setupStatus"
+        );
+
+
+      if (setupStatus) {
+
+        setupStatus.textContent =
+          "已送出部署，等待對手...";
+      }
+    };
+}
 
 
 // ======================================================
-// Battle 畫面
+// 戰鬥畫面
 // ======================================================
 
 function renderBattle() {
@@ -1272,31 +1437,51 @@ function renderBattle() {
   }
 
 
-  document
-    .getElementById(
+  console.log(
+    "[RENDER BATTLE]",
+    state
+  );
+
+
+  const battleRoomCode =
+    document.getElementById(
       "battleRoomCode"
-    )
-    .textContent =
+    );
+
+
+  if (battleRoomCode) {
+
+    battleRoomCode.textContent =
       roomCode;
+  }
 
 
-  document
-    .getElementById(
+  const turnText =
+    document.getElementById(
       "turnText"
-    )
-    .textContent =
+    );
+
+
+  if (turnText) {
+
+    turnText.textContent =
       state.is_your_turn
         ?
         "你的回合"
         :
         "對手回合";
+  }
 
 
-  document
-    .getElementById(
+  const statusText =
+    document.getElementById(
       "statusText"
-    )
-    .textContent =
+    );
+
+
+  if (statusText) {
+
+    statusText.textContent =
       state.message
       ||
       (
@@ -1306,6 +1491,7 @@ function renderBattle() {
           :
           "等待對手行動"
       );
+  }
 
 
   const ownBoard =
@@ -1328,19 +1514,12 @@ function renderBattle() {
 
   renderBoard(
     enemyBoard,
-    (
-      row,
-      col
-    ) =>
-      onEnemyClick(
-        row,
-        col
-      )
+    onEnemyClick
   );
 
 
   // ====================================================
-  // 自己的船
+  // 自己的棋盤
   // ====================================================
 
   const ownShipCells =
@@ -1362,7 +1541,6 @@ function renderBattle() {
           Number(
             cell.dataset.row
           ),
-
           Number(
             cell.dataset.col
           )
@@ -1412,7 +1590,7 @@ function renderBattle() {
 
 
   // ====================================================
-  // 敵方海域
+  // 敵方棋盤
   // ====================================================
 
   [
@@ -1425,7 +1603,6 @@ function renderBattle() {
           Number(
             cell.dataset.row
           ),
-
           Number(
             cell.dataset.col
           )
@@ -1438,10 +1615,6 @@ function renderBattle() {
         ];
 
 
-      // -------------------------
-      // 命中
-      // -------------------------
-
       if (
         attackState ===
         "hit"
@@ -1452,10 +1625,6 @@ function renderBattle() {
         );
       }
 
-
-      // -------------------------
-      // MISS
-      // -------------------------
 
       if (
         attackState ===
@@ -1468,9 +1637,9 @@ function renderBattle() {
       }
 
 
-      // -------------------------
-      // Radar 中心數字
-      // -------------------------
+      // ===============================================
+      // Radar 中心
+      // ===============================================
 
       if (
         state.radar_numbers
@@ -1494,14 +1663,12 @@ function renderBattle() {
       }
 
 
-      // 不是你的回合
-      if (
-        !state.is_your_turn
-      ) {
+      // ===============================================
+      // 不是你的回合才禁止
+      // ===============================================
 
-        cell.disabled =
-          true;
-      }
+      cell.disabled =
+        !state.is_your_turn;
     }
   );
 
@@ -1513,7 +1680,7 @@ function renderBattle() {
 
 
 // ======================================================
-// Skills
+// 技能
 // ======================================================
 
 function renderSkills(state) {
@@ -1522,6 +1689,12 @@ function renderSkills(state) {
     document.getElementById(
       "skillList"
     );
+
+
+  if (!list) {
+
+    return;
+  }
 
 
   list.innerHTML =
@@ -1534,9 +1707,16 @@ function renderSkills(state) {
       const definition =
         SHIP_TYPES.find(
           item =>
-            item.id ===
+            item.id
+            ===
             ship.id
         );
+
+
+      if (!definition) {
+
+        return;
+      }
 
 
       const card =
@@ -1583,7 +1763,8 @@ function renderSkills(state) {
           ||
           ship.sunk
           ||
-          ship.id ===
+          ship.id
+            ===
             "destroyer"
           ||
           ship.cooldown_remaining
@@ -1596,10 +1777,6 @@ function renderSkills(state) {
         disabled;
 
 
-      // ------------------------
-      // Destroyer
-      // ------------------------
-
       if (
         ship.id ===
         "destroyer"
@@ -1607,14 +1784,8 @@ function renderSkills(state) {
 
         button.textContent =
           "被動";
-      }
 
-
-      // ------------------------
-      // Cooldown
-      // ------------------------
-
-      else if (
+      } else if (
         ship.cooldown_remaining
         >
         0
@@ -1622,34 +1793,21 @@ function renderSkills(state) {
 
         button.textContent =
           `冷卻 ${ship.cooldown_remaining} 回合`;
-      }
 
-
-      // ------------------------
-      // Ready
-      // ------------------------
-
-      else {
+      } else {
 
         button.textContent =
           "使用技能";
+
       }
 
-
-      // ------------------------
-      // 使用技能
-      // ------------------------
 
       if (!disabled) {
 
         button.onclick =
           () => {
 
-
-            // =====================
             // Shield
-            // =====================
-
             if (
               ship.id ===
               "shield"
@@ -1676,36 +1834,37 @@ function renderSkills(state) {
                 selectedSkill =
                   null;
               }
+
+
+              return;
             }
 
 
-            // =====================
             // Radar / Missile
-            // =====================
-
-            else {
-
-              selectedSkill =
-                ship.id;
+            selectedSkill =
+              ship.id;
 
 
-              document
-                .getElementById(
-                  "statusText"
-                )
-                .textContent =
-                  `已選擇 ${definition.name}，請點敵方格子`;
-
-
-              renderSkills(
-                state
+            const statusText =
+              document.getElementById(
+                "statusText"
               );
+
+
+            if (statusText) {
+
+              statusText.textContent =
+                `已選擇 ${definition.name}，請點敵方格子`;
             }
+
+
+            renderSkills(
+              state
+            );
           };
       }
 
 
-      // 顯示目前選中的技能
       if (
         selectedSkill
         ===
@@ -1740,17 +1899,36 @@ function onEnemyClick(
   col
 ) {
 
-  if (
-    !latestState
-    ||
-    !latestState.is_your_turn
-  ) {
+  console.log(
+    "[ENEMY CLICK]",
+    row,
+    col,
+    latestState
+  );
+
+
+  if (!latestState) {
+
+    console.warn(
+      "[CLICK BLOCKED] no latestState"
+    );
 
     return;
   }
 
 
-  // WebSocket 掛掉
+  if (
+    !latestState.is_your_turn
+  ) {
+
+    console.warn(
+      "[CLICK BLOCKED] not your turn"
+    );
+
+    return;
+  }
+
+
   if (
     !socket
     ||
@@ -1759,12 +1937,22 @@ function onEnemyClick(
       WebSocket.OPEN
   ) {
 
-    document
-      .getElementById(
+    console.warn(
+      "[CLICK BLOCKED] socket disconnected"
+    );
+
+
+    const statusText =
+      document.getElementById(
         "statusText"
-      )
-      .textContent =
+      );
+
+
+    if (statusText) {
+
+      statusText.textContent =
         "連線中斷，正在重新連線…";
+    }
 
 
     scheduleReconnect();
@@ -1774,12 +1962,10 @@ function onEnemyClick(
 
 
   // ====================================================
-  // 使用技能
+  // 技能攻擊
   // ====================================================
 
-  if (
-    selectedSkill
-  ) {
+  if (selectedSkill) {
 
     const sent =
       send(
@@ -1795,7 +1981,6 @@ function onEnemyClick(
             selectedSkill,
 
           row,
-
           col
         }
       );
@@ -1806,6 +1991,9 @@ function onEnemyClick(
       selectedSkill =
         null;
     }
+
+
+    return;
   }
 
 
@@ -1813,28 +2001,24 @@ function onEnemyClick(
   // 普通攻擊
   // ====================================================
 
-  else {
+  send(
+    "attack",
+    {
+      room_code:
+        roomCode,
 
-    send(
-      "attack",
-      {
-        room_code:
-          roomCode,
+      player_id:
+        playerId,
 
-        player_id:
-          playerId,
-
-        row,
-
-        col
-      }
-    );
-  }
+      row,
+      col
+    }
+  );
 }
 
 
 // ======================================================
-// 擊沉通知 Modal
+// 擊沉通知
 // ======================================================
 
 function showSunkModal(
@@ -1842,114 +2026,47 @@ function showSunkModal(
   message
 ) {
 
+  console.log(
+    "[SHOW SUNK MODAL]",
+    title,
+    message
+  );
+
+
   const modal =
     document.getElementById(
       "sunkModal"
     );
 
 
-  document
-    .getElementById(
+  const modalTitle =
+    document.getElementById(
       "sunkModalTitle"
-    )
-    .textContent =
-      title;
+    );
 
 
-  document
-    .getElementById(
+  const modalText =
+    document.getElementById(
       "sunkModalText"
-    )
-    .textContent =
-      message;
-
-
-  modal.classList.remove(
-    "hidden"
-  );
-}
-
-
-document
-  .getElementById(
-    "closeSunkModalBtn"
-  )
-  .onclick = () => {
-
-    document
-      .getElementById(
-        "sunkModal"
-      )
-      .classList.add(
-        "hidden"
-      );
-  };
-
-
-// ======================================================
-// WIN / LOSE
-// ======================================================
-
-function showResultOverlay(youWon) {
-
-  console.log(
-    "[DEBUG GAME OVER FRONTEND]",
-    youWon
-  );
-
-  const overlay =
-    document.getElementById(
-      "resultOverlay"
-    );
-
-  const word =
-    document.getElementById(
-      "resultWord"
-    );
-
-  const subtext =
-    document.getElementById(
-      "resultSubtext"
     );
 
 
-  // =========================================
-  // 如果新版 WIN / LOSE overlay 存在
-  // =========================================
-
+  // 如果原本 modal 存在
   if (
-    overlay
+    modal
     &&
-    word
+    modalTitle
     &&
-    subtext
+    modalText
   ) {
 
-    if (youWon) {
+    modalTitle.textContent =
+      title;
 
-      word.textContent =
-        "WIN";
+    modalText.textContent =
+      message;
 
-      word.className =
-        "result-word win";
-
-      subtext.textContent =
-        "你擊沉了敵方全部戰艦";
-
-    } else {
-
-      word.textContent =
-        "LOSE";
-
-      word.className =
-        "result-word lose";
-
-      subtext.textContent =
-        "你的艦隊已全數被擊沉";
-    }
-
-
-    overlay.classList.remove(
+    modal.classList.remove(
       "hidden"
     );
 
@@ -1957,79 +2074,301 @@ function showResultOverlay(youWon) {
   }
 
 
-  // =========================================
-  // 保險方案：
-  // 如果 overlay HTML 不存在
-  // 就使用原本 gameOverScreen
-  // =========================================
+  // 保險
+  alert(
+    `${title}\n${message}`
+  );
+}
 
-  const gameOverScreen =
+
+const closeSunkModalBtn =
+  document.getElementById(
+    "closeSunkModalBtn"
+  );
+
+
+if (closeSunkModalBtn) {
+
+  closeSunkModalBtn.onclick =
+    () => {
+
+      const modal =
+        document.getElementById(
+          "sunkModal"
+        );
+
+
+      if (modal) {
+
+        modal.classList.add(
+          "hidden"
+        );
+      }
+
+    };
+}
+
+
+// ======================================================
+// WIN / LOSE
+// ======================================================
+
+function showResultOverlay(
+  youWon
+) {
+
+  console.log(
+    "[SHOW RESULT]",
+    youWon
+  );
+
+
+  // 避免重複建立
+  const existing =
     document.getElementById(
-      "gameOverScreen"
-    );
-
-  const winnerText =
-    document.getElementById(
-      "winnerText"
+      "finalGameResult"
     );
 
 
-  if (
-    gameOverScreen
-    &&
-    winnerText
-  ) {
-
-    showScreen(
-      "gameOver"
-    );
-
-    winnerText.textContent =
-      youWon
-        ? "WIN！你贏了！"
-        : "LOSE！你輸了！";
+  if (existing) {
 
     return;
   }
 
 
-  // =========================================
-  // 最後一道保險
-  // =========================================
+  // ====================================================
+  // 全螢幕遮罩
+  // ====================================================
 
-  alert(
+  const overlay =
+    document.createElement(
+      "div"
+    );
+
+
+  overlay.id =
+    "finalGameResult";
+
+
+  overlay.style.position =
+    "fixed";
+
+  overlay.style.inset =
+    "0";
+
+  overlay.style.zIndex =
+    "999999";
+
+  overlay.style.background =
+    "rgba(2, 6, 12, 0.97)";
+
+  overlay.style.display =
+    "flex";
+
+  overlay.style.flexDirection =
+    "column";
+
+  overlay.style.alignItems =
+    "center";
+
+  overlay.style.justifyContent =
+    "center";
+
+  overlay.style.textAlign =
+    "center";
+
+
+  // ====================================================
+  // WIN / LOSE
+  // ====================================================
+
+  const title =
+    document.createElement(
+      "div"
+    );
+
+
+  title.textContent =
     youWon
-      ? "WIN！你贏了！"
-      : "LOSE！你輸了！"
+      ?
+      "WIN"
+      :
+      "LOSE";
+
+
+  title.style.fontSize =
+    "clamp(90px, 20vw, 220px)";
+
+  title.style.fontWeight =
+    "900";
+
+  title.style.letterSpacing =
+    "12px";
+
+  title.style.lineHeight =
+    "1";
+
+
+  title.style.color =
+    youWon
+      ?
+      "#80e0ff"
+      :
+      "#ff6b6b";
+
+
+  title.style.textShadow =
+    youWon
+      ?
+      "0 0 45px rgba(81,181,255,.6)"
+      :
+      "0 0 45px rgba(255,107,107,.5)";
+
+
+  // ====================================================
+  // 說明
+  // ====================================================
+
+  const message =
+    document.createElement(
+      "div"
+    );
+
+
+  message.textContent =
+    youWon
+      ?
+      "你擊沉了敵方全部戰艦"
+      :
+      "你的艦隊已全數被擊沉";
+
+
+  message.style.fontSize =
+    "clamp(18px, 3vw, 28px)";
+
+  message.style.marginTop =
+    "30px";
+
+  message.style.color =
+    "#ffffff";
+
+
+  // ====================================================
+  // 回大廳
+  // ====================================================
+
+  const button =
+    document.createElement(
+      "button"
+    );
+
+
+  button.textContent =
+    "回到大廳";
+
+
+  button.style.marginTop =
+    "42px";
+
+  button.style.padding =
+    "14px 34px";
+
+  button.style.fontSize =
+    "18px";
+
+  button.style.fontWeight =
+    "800";
+
+  button.style.border =
+    "none";
+
+  button.style.borderRadius =
+    "12px";
+
+  button.style.cursor =
+    "pointer";
+
+  button.style.background =
+    "#51b5ff";
+
+  button.style.color =
+    "#07101d";
+
+
+  button.onclick =
+    () => {
+
+      intentionalClose =
+        true;
+
+
+      location.reload();
+    };
+
+
+  overlay.appendChild(
+    title
+  );
+
+  overlay.appendChild(
+    message
+  );
+
+  overlay.appendChild(
+    button
+  );
+
+
+  document.body.appendChild(
+    overlay
+  );
+
+
+  console.log(
+    "[RESULT OVERLAY CREATED]"
   );
 }
 
 
 // ======================================================
-// 回到首頁
+// 原本回大廳按鈕
 // ======================================================
 
-document
-  .getElementById(
+const resultBackBtn =
+  document.getElementById(
     "resultBackBtn"
-  )
-  .onclick = () => {
-
-    intentionalClose =
-      true;
-
-    location.reload();
-  };
+  );
 
 
-document
-  .getElementById(
+if (resultBackBtn) {
+
+  resultBackBtn.onclick =
+    () => {
+
+      intentionalClose =
+        true;
+
+      location.reload();
+
+    };
+}
+
+
+const backLobbyBtn =
+  document.getElementById(
     "backLobbyBtn"
-  )
-  .onclick = () => {
+  );
 
-    intentionalClose =
-      true;
 
-    location.reload();
-  };
+if (backLobbyBtn) {
+
+  backLobbyBtn.onclick =
+    () => {
+
+      intentionalClose =
+        true;
+
+      location.reload();
+
+    };
+}
