@@ -3,8 +3,8 @@ const SHIP_TYPES = [
     id: "destroyer",
     name: "Destroyer",
     size: 2,
-    cooldown: 0,
-    description: "被動戰艦，沒有主動技能。"
+    cooldown: 3,
+    description: "指定中心格必炸，並隨機轟炸周圍最多 4 格。"
   },
   {
     id: "radar",
@@ -102,22 +102,12 @@ function wsUrl() {
 
 function connectSocket(onOpen) {
 
-  console.log(
-    "[WS] connecting..."
-  );
-
-
   socket = new WebSocket(
     wsUrl()
   );
 
 
   socket.onopen = () => {
-
-    console.log(
-      "[WS] connected"
-    );
-
 
     if (reconnectTimer) {
 
@@ -138,12 +128,6 @@ function connectSocket(onOpen) {
 
   socket.onmessage = event => {
 
-    console.log(
-      "[WS RECEIVE]",
-      event.data
-    );
-
-
     let msg;
 
     try {
@@ -156,7 +140,7 @@ function connectSocket(onOpen) {
     } catch (error) {
 
       console.error(
-        "[WS JSON ERROR]",
+        "WebSocket JSON error",
         error
       );
 
@@ -170,14 +154,7 @@ function connectSocket(onOpen) {
   };
 
 
-  socket.onclose = event => {
-
-    console.log(
-      "[WS CLOSED]",
-      event.code,
-      event.reason
-    );
-
+  socket.onclose = () => {
 
     if (intentionalClose) {
 
@@ -215,7 +192,7 @@ function connectSocket(onOpen) {
   socket.onerror = error => {
 
     console.error(
-      "[WS ERROR]",
+      "WebSocket error",
       error
     );
   };
@@ -227,11 +204,6 @@ function connectSocket(onOpen) {
 // ======================================================
 
 function scheduleReconnect() {
-
-  console.log(
-    "[WS] schedule reconnect"
-  );
-
 
   const status =
     document.getElementById(
@@ -262,11 +234,6 @@ function scheduleReconnect() {
         connectSocket(
           () => {
 
-            console.log(
-              "[WS] trying resume_room"
-            );
-
-
             send(
               "resume_room",
               {
@@ -292,13 +259,6 @@ function send(
   payload = {}
 ) {
 
-  console.log(
-    "[WS SEND]",
-    type,
-    payload
-  );
-
-
   if (
     socket
     &&
@@ -317,11 +277,6 @@ function send(
 
     return true;
   }
-
-
-  console.warn(
-    "[WS SEND FAILED] socket not open"
-  );
 
 
   if (
@@ -470,11 +425,6 @@ if (joinRoomBtn) {
 
 function handleMessage(msg) {
 
-  console.log(
-    "[HANDLE MESSAGE]",
-    msg
-  );
-
 
   // ====================================================
   // 建立房間成功
@@ -566,12 +516,6 @@ function handleMessage(msg) {
     "room_resumed"
   ) {
 
-    console.log(
-      "[ROOM RESUMED]",
-      msg
-    );
-
-
     roomCode =
       msg.room_code;
 
@@ -639,7 +583,7 @@ function handleMessage(msg) {
 
 
   // ====================================================
-  // 對手斷線 / 重連訊息
+  // 對手連線狀態
   // ====================================================
 
   if (
@@ -675,12 +619,6 @@ function handleMessage(msg) {
     "ship_sunk"
   ) {
 
-    console.log(
-      "[SHIP SUNK]",
-      msg
-    );
-
-
     showSunkModal(
       msg.title
       ||
@@ -705,12 +643,6 @@ function handleMessage(msg) {
     "game_over"
   ) {
 
-    console.log(
-      "[GAME OVER RECEIVED]",
-      msg
-    );
-
-
     showResultOverlay(
       msg.you_won
     );
@@ -733,16 +665,6 @@ function handleMessage(msg) {
       msg.state;
 
 
-    console.log(
-      "[STATE UPDATE]",
-      latestState
-    );
-
-
-    // -----------------------
-    // Setup
-    // -----------------------
-
     if (
       msg.state.phase
       ===
@@ -757,6 +679,8 @@ function handleMessage(msg) {
 
       if (
         setupStatus
+        &&
+        screens.setup
         &&
         !screens.setup
           .classList
@@ -775,10 +699,6 @@ function handleMessage(msg) {
     }
 
 
-    // -----------------------
-    // Battle
-    // -----------------------
-
     if (
       msg.state.phase
       ===
@@ -793,21 +713,11 @@ function handleMessage(msg) {
     }
 
 
-    // -----------------------
-    // Finished
-    // -----------------------
-
     if (
       msg.state.phase
       ===
       "finished"
     ) {
-
-      console.log(
-        "[STATE FINISHED]",
-        msg.state
-      );
-
 
       showResultOverlay(
         msg.state.you_won
@@ -827,12 +737,6 @@ function handleMessage(msg) {
     msg.type ===
     "error"
   ) {
-
-    console.error(
-      "[SERVER ERROR]",
-      msg.message
-    );
-
 
     const lobbyStatus =
       document.getElementById(
@@ -981,13 +885,6 @@ function renderBoard(
 
         cell.onclick =
           () => {
-
-            console.log(
-              "[CELL CLICK]",
-              row,
-              col
-            );
-
 
             onClick(
               row,
@@ -1349,15 +1246,15 @@ if (verticalBtn) {
     );
 
 
-    const horizontalBtn =
+    const horizontalButton =
       document.getElementById(
         "horizontalBtn"
       );
 
 
-    if (horizontalBtn) {
+    if (horizontalButton) {
 
-      horizontalBtn.classList.remove(
+      horizontalButton.classList.remove(
         "active"
       );
     }
@@ -1435,12 +1332,6 @@ function renderBattle() {
 
     return;
   }
-
-
-  console.log(
-    "[RENDER BATTLE]",
-    state
-  );
 
 
   const battleRoomCode =
@@ -1615,6 +1506,7 @@ function renderBattle() {
         ];
 
 
+      // 命中
       if (
         attackState ===
         "hit"
@@ -1626,6 +1518,7 @@ function renderBattle() {
       }
 
 
+      // MISS
       if (
         attackState ===
         "miss"
@@ -1637,9 +1530,9 @@ function renderBattle() {
       }
 
 
-      // ===============================================
-      // Radar 中心
-      // ===============================================
+      // =================================================
+      // Radar 中心黃色數字
+      // =================================================
 
       if (
         state.radar_numbers
@@ -1663,10 +1556,7 @@ function renderBattle() {
       }
 
 
-      // ===============================================
-      // 不是你的回合才禁止
-      // ===============================================
-
+      // 只有不是你的回合才鎖住
       cell.disabled =
         !state.is_your_turn;
     }
@@ -1757,15 +1647,12 @@ function renderSkills(state) {
         "skill-btn";
 
 
+      // Destroyer 現在也有主動技能
       const disabled =
         (
           !state.is_your_turn
           ||
           ship.sunk
-          ||
-          ship.id
-            ===
-            "destroyer"
           ||
           ship.cooldown_remaining
             >
@@ -1778,14 +1665,6 @@ function renderSkills(state) {
 
 
       if (
-        ship.id ===
-        "destroyer"
-      ) {
-
-        button.textContent =
-          "被動";
-
-      } else if (
         ship.cooldown_remaining
         >
         0
@@ -1807,7 +1686,10 @@ function renderSkills(state) {
         button.onclick =
           () => {
 
-            // Shield
+            // ===========================================
+            // Shield 直接啟動，不用選格子
+            // ===========================================
+
             if (
               ship.id ===
               "shield"
@@ -1840,7 +1722,10 @@ function renderSkills(state) {
             }
 
 
-            // Radar / Missile
+            // ===========================================
+            // Destroyer / Radar / Missile 都要選一格
+            // ===========================================
+
             selectedSkill =
               ship.id;
 
@@ -1899,19 +1784,7 @@ function onEnemyClick(
   col
 ) {
 
-  console.log(
-    "[ENEMY CLICK]",
-    row,
-    col,
-    latestState
-  );
-
-
   if (!latestState) {
-
-    console.warn(
-      "[CLICK BLOCKED] no latestState"
-    );
 
     return;
   }
@@ -1920,10 +1793,6 @@ function onEnemyClick(
   if (
     !latestState.is_your_turn
   ) {
-
-    console.warn(
-      "[CLICK BLOCKED] not your turn"
-    );
 
     return;
   }
@@ -1936,11 +1805,6 @@ function onEnemyClick(
       !==
       WebSocket.OPEN
   ) {
-
-    console.warn(
-      "[CLICK BLOCKED] socket disconnected"
-    );
-
 
     const statusText =
       document.getElementById(
@@ -1962,7 +1826,7 @@ function onEnemyClick(
 
 
   // ====================================================
-  // 技能攻擊
+  // 技能
   // ====================================================
 
   if (selectedSkill) {
@@ -2026,13 +1890,6 @@ function showSunkModal(
   message
 ) {
 
-  console.log(
-    "[SHOW SUNK MODAL]",
-    title,
-    message
-  );
-
-
   const modal =
     document.getElementById(
       "sunkModal"
@@ -2051,7 +1908,6 @@ function showSunkModal(
     );
 
 
-  // 如果原本 modal 存在
   if (
     modal
     &&
@@ -2074,7 +1930,6 @@ function showSunkModal(
   }
 
 
-  // 保險
   alert(
     `${title}\n${message}`
   );
@@ -2117,13 +1972,6 @@ function showResultOverlay(
   youWon
 ) {
 
-  console.log(
-    "[SHOW RESULT]",
-    youWon
-  );
-
-
-  // 避免重複建立
   const existing =
     document.getElementById(
       "finalGameResult"
@@ -2135,10 +1983,6 @@ function showResultOverlay(
     return;
   }
 
-
-  // ====================================================
-  // 全螢幕遮罩
-  // ====================================================
 
   const overlay =
     document.createElement(
@@ -2177,10 +2021,6 @@ function showResultOverlay(
   overlay.style.textAlign =
     "center";
 
-
-  // ====================================================
-  // WIN / LOSE
-  // ====================================================
 
   const title =
     document.createElement(
@@ -2225,10 +2065,6 @@ function showResultOverlay(
       "0 0 45px rgba(255,107,107,.5)";
 
 
-  // ====================================================
-  // 說明
-  // ====================================================
-
   const message =
     document.createElement(
       "div"
@@ -2252,10 +2088,6 @@ function showResultOverlay(
   message.style.color =
     "#ffffff";
 
-
-  // ====================================================
-  // 回大廳
-  // ====================================================
 
   const button =
     document.createElement(
@@ -2301,7 +2133,6 @@ function showResultOverlay(
       intentionalClose =
         true;
 
-
       location.reload();
     };
 
@@ -2321,11 +2152,6 @@ function showResultOverlay(
 
   document.body.appendChild(
     overlay
-  );
-
-
-  console.log(
-    "[RESULT OVERLAY CREATED]"
   );
 }
 
