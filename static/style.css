@@ -1,137 +1,1218 @@
+:root {
+  --bg: #07101d;
+  --panel: #111d30;
+  --panel-2: #17263d;
 
-:root{
-  --bg:#08111f;--panel:#101b2e;--panel2:#15233a;--line:#28405f;
-  --text:#edf5ff;--muted:#98abc3;--accent:#51b5ff;--accent2:#80e0ff;
-  --danger:#ff6b6b;--success:#66d19e;--warning:#ffc857;
+  --text: #eef7ff;
+  --muted: #91a5bd;
+
+  --primary: #51b5ff;
+  --primary-dark: #247db9;
+
+  --success: #4fd49b;
+  --danger: #ff6373;
+  --warning: #ffc857;
+
+  --border: rgba(255, 255, 255, 0.12);
+
+  --cell: #25344a;
+  --cell-hover: #334a66;
+
+  --ship: #5b7897;
+
+  --hit: #7e2430;
+  --miss: #070b10;
 }
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at top left,rgba(40,130,220,.22),transparent 30%),linear-gradient(180deg,#07101d,#08111f 60%,#050b14);color:var(--text);min-height:100vh}
-button,input{font:inherit}
-button{cursor:pointer;border:0}
-.app-shell{width:min(1400px,94vw);margin:0 auto;padding-bottom:40px}
-.topbar{min-height:96px;display:flex;justify-content:space-between;align-items:center}
-.topbar h1{margin:0;font-size:clamp(28px,4vw,44px)} .topbar p{margin:6px 0 0;color:var(--muted)}
-.panel{background:rgba(16,27,46,.92);border:1px solid rgba(123,172,224,.16);border-radius:22px;box-shadow:0 16px 50px rgba(0,0,0,.28);padding:24px}
-.hidden{display:none!important}
-.lobby-panel,.center-panel{max-width:620px;margin:70px auto;text-align:center}
-.lobby-actions{display:grid;gap:18px;margin:24px 0}
-.join-row{display:grid;grid-template-columns:1fr auto;gap:10px}
-input{background:#0a1525;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:14px 16px;text-transform:uppercase;letter-spacing:4px;font-weight:800;text-align:center}
-.primary-btn{padding:13px 18px;border-radius:12px;color:#07101d;font-weight:800;background:linear-gradient(135deg,var(--accent2),var(--accent))}
-.ghost-btn{padding:12px 16px;border-radius:12px;background:#1b2b43;color:var(--text);border:1px solid #2f4a6c}
-.room-code{font-size:56px;font-weight:900;letter-spacing:12px;color:var(--accent2);margin:12px 0}
-.room-strip{color:var(--muted);margin-bottom:10px}
-.setup-layout,.battle-layout{display:grid;grid-template-columns:minmax(420px,1fr) minmax(260px,340px);gap:24px;align-items:start}
-.battle-layout{grid-template-columns:repeat(2,minmax(360px,1fr)) 280px;margin-top:20px}
-.board-title{color:var(--muted);font-weight:700;margin-bottom:12px}
-.board{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;width:100%;max-width:620px;aspect-ratio:1/1}
-.cell{display:grid;place-items:center;aspect-ratio:1/1;border-radius:7px;border:1px solid #2a4a6f;background:linear-gradient(145deg,#113152,#0c2945);color:#fff;transition:.12s}
-.cell:hover{transform:translateY(-1px);border-color:var(--accent)}
-.cell.ship{background:linear-gradient(145deg,#667890,#3b4d66);border-color:#8fa7c4}
-.cell.hit{background:linear-gradient(145deg,#8f2b38,#5d1823);border-color:#ff9aa5}
-.cell.miss{background:#16273a}
-.cell.radar-center{background:#070b10;border-color:var(--warning);color:#ffd84d;font-weight:900;font-size:clamp(14px,2vw,22px);box-shadow:inset 0 0 0 2px rgba(255,200,87,.75)}
-.fleet-panel,.skill-panel{background:var(--panel2);border-radius:18px;padding:18px}
-.ship-card,.skill-card{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;background:rgba(255,255,255,.02)}
-.ship-card.current{border-color:var(--accent)}
-.ship-card span,.skill-card span{color:var(--muted);font-size:14px}
-.direction-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
-.direction-row button,.skill-btn{padding:11px 14px;border-radius:12px;background:#1b2b43;color:var(--text);border:1px solid #2f4a6c}
-.direction-row button.active,.skill-btn.active{background:rgba(81,181,255,.18);border-color:var(--accent)}
-.skill-btn{width:100%;text-align:left;margin-top:10px}
-.skill-btn:disabled{opacity:.4;cursor:not-allowed}
-.battle-header{display:flex;justify-content:space-between;align-items:center}
-.badge{display:inline-flex;padding:7px 10px;background:rgba(81,181,255,.16);color:#bce8ff;border-radius:999px;font-size:14px}
-.status{color:var(--warning);font-weight:700}.muted{color:var(--muted)}
-.legend{border-top:1px solid var(--line);margin-top:16px;padding-top:14px;display:grid;gap:9px;color:var(--muted);font-size:13px}
-.legend-box{display:inline-block;width:15px;height:15px;vertical-align:-2px;border-radius:4px;margin-right:7px}
-.legend-box.ship{background:#667890}.legend-box.hit{background:#8f2b38}.legend-box.miss{background:#16273a}.legend-box.scan{border:2px solid var(--warning)}
-@media(max-width:1050px){.battle-layout{grid-template-columns:1fr 1fr}.skill-panel{grid-column:1/-1}}
-@media(max-width:760px){.setup-layout,.battle-layout{grid-template-columns:1fr}.skill-panel{grid-column:auto}.panel{padding:16px}.cell{border-radius:4px}}
 
 
-/* 雷達中心：數字維持黃色，但底色由攻擊結果決定 */
-.cell.radar-center {
-  background: #070b10;
-  color: #ffd84d;
-}
-.cell.hit.radar-center {
-  background: linear-gradient(145deg,#8f2b38,#5d1823);
-  border-color: #ff9aa5;
-  color: #ffd84d;
-}
-.cell.miss.radar-center {
-  background: #070b10;
-  border-color: var(--warning);
-  color: #ffd84d;
+* {
+  box-sizing: border-box;
 }
 
-/* 擊沉通知 */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: grid;
-  place-items: center;
-  background: rgba(2, 6, 12, .78);
-  backdrop-filter: blur(5px);
-}
-.modal-card {
-  width: min(440px, 90vw);
-  text-align: center;
-  background: #111d30;
-  border: 1px solid rgba(255,255,255,.16);
-  border-radius: 24px;
-  padding: 30px;
-  box-shadow: 0 28px 90px rgba(0,0,0,.55);
-}
-.modal-icon {
-  font-size: 52px;
-  margin-bottom: 6px;
-}
-.modal-card h2 {
-  margin: 8px 0 10px;
-}
-.modal-card p {
-  color: var(--muted);
-  font-size: 18px;
-  margin-bottom: 22px;
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
 }
 
-/* WIN / LOSE 全螢幕 */
-.result-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+
+body {
+  min-height: 100vh;
+
   background:
-    radial-gradient(circle at center, rgba(47,130,210,.28), transparent 36%),
-    rgba(2,6,12,.96);
+    radial-gradient(
+      circle at top,
+      #10243e 0%,
+      #07101d 50%,
+      #03080f 100%
+    );
+
+  color: var(--text);
+
+  font-family:
+    Inter,
+    "Noto Sans TC",
+    Arial,
+    sans-serif;
 }
+
+
+button,
+input {
+  font: inherit;
+}
+
+
+button {
+  transition:
+    transform 0.12s ease,
+    opacity 0.12s ease,
+    background 0.12s ease,
+    border-color 0.12s ease;
+}
+
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+
+.hidden {
+  display: none !important;
+}
+
+
+/* =========================================================
+   Layout
+   ========================================================= */
+
+.screen {
+  width: min(1200px, 94vw);
+  margin: 0 auto;
+  padding: 32px 0 60px;
+}
+
+
+.card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(22, 37, 61, 0.96),
+      rgba(12, 24, 40, 0.96)
+    );
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius: 22px;
+
+  padding: 24px;
+
+  box-shadow:
+    0 20px 60px
+    rgba(0, 0, 0, 0.35);
+}
+
+
+h1,
+h2,
+h3 {
+  margin-top: 0;
+}
+
+
+h1 {
+  font-size:
+    clamp(
+      36px,
+      7vw,
+      78px
+    );
+
+  letter-spacing:
+    -0.04em;
+}
+
+
+h2 {
+  font-size:
+    clamp(
+      24px,
+      4vw,
+      38px
+    );
+}
+
+
+p {
+  color:
+    var(--muted);
+
+  line-height:
+    1.65;
+}
+
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+
+.primary-btn {
+  border: none;
+
+  background:
+    linear-gradient(
+      135deg,
+      #51b5ff,
+      #2c91dc
+    );
+
+  color:
+    #05101c;
+
+  font-weight:
+    900;
+
+  border-radius:
+    12px;
+
+  padding:
+    13px
+    22px;
+
+  cursor:
+    pointer;
+
+  box-shadow:
+    0 10px 25px
+    rgba(81, 181, 255, 0.18);
+}
+
+
+.secondary-btn {
+  border:
+    1px solid
+    var(--border);
+
+  background:
+    rgba(255, 255, 255, 0.05);
+
+  color:
+    var(--text);
+
+  border-radius:
+    12px;
+
+  padding:
+    12px
+    18px;
+
+  cursor:
+    pointer;
+}
+
+
+.secondary-btn.active,
+.skill-btn.active {
+  border-color:
+    var(--warning);
+
+  box-shadow:
+    0 0 0 2px
+    rgba(255, 200, 87, 0.22);
+}
+
+
+/* =========================================================
+   Lobby
+   ========================================================= */
+
+.lobby-wrap {
+  min-height:
+    90vh;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+}
+
+
+.lobby-card {
+  width:
+    min(
+      620px,
+      94vw
+    );
+
+  text-align:
+    center;
+}
+
+
+.room-actions {
+  display:
+    grid;
+
+  gap:
+    14px;
+
+  margin-top:
+    28px;
+}
+
+
+.room-input-row {
+  display:
+    grid;
+
+  grid-template-columns:
+    1fr auto;
+
+  gap:
+    10px;
+}
+
+
+input {
+  width:
+    100%;
+
+  background:
+    #07111f;
+
+  color:
+    var(--text);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    12px;
+
+  padding:
+    13px
+    14px;
+
+  outline:
+    none;
+}
+
+
+input:focus {
+  border-color:
+    var(--primary);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(81, 181, 255, 0.12);
+}
+
+
+.status-text {
+  margin-top:
+    14px;
+
+  min-height:
+    24px;
+
+  color:
+    var(--muted);
+}
+
+
+/* =========================================================
+   Room code
+   ========================================================= */
+
+.room-code {
+  display:
+    inline-block;
+
+  padding:
+    8px 14px;
+
+  border:
+    1px solid
+    rgba(255, 200, 87, 0.45);
+
+  background:
+    rgba(255, 200, 87, 0.08);
+
+  color:
+    var(--warning);
+
+  border-radius:
+    12px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.15em;
+}
+
+
+/* =========================================================
+   Setup
+   ========================================================= */
+
+.setup-layout {
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(260px, 340px);
+
+  gap:
+    28px;
+
+  align-items:
+    start;
+}
+
+
+.setup-controls {
+  display:
+    flex;
+
+  gap:
+    10px;
+
+  flex-wrap:
+    wrap;
+
+  margin-bottom:
+    18px;
+}
+
+
+.ship-list {
+  display:
+    grid;
+
+  gap:
+    12px;
+}
+
+
+.ship-card {
+  border:
+    1px solid
+    var(--border);
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  border-radius:
+    14px;
+
+  padding:
+    14px;
+
+  display:
+    grid;
+
+  gap:
+    6px;
+}
+
+
+.ship-card strong {
+  font-size:
+    16px;
+}
+
+
+.ship-card span {
+  color:
+    var(--muted);
+
+  font-size:
+    14px;
+
+  line-height:
+    1.45;
+}
+
+
+.ship-card.current {
+  border-color:
+    var(--primary);
+
+  box-shadow:
+    0 0 0 2px
+    rgba(81, 181, 255, 0.12);
+}
+
+
+/* =========================================================
+   Battle layout
+   ========================================================= */
+
+.battle-header {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    18px;
+
+  flex-wrap:
+    wrap;
+
+  margin-bottom:
+    24px;
+}
+
+
+.battle-layout {
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap:
+    30px;
+}
+
+
+.board-panel {
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    20px;
+
+  padding:
+    18px;
+}
+
+
+.board-title {
+  margin-bottom:
+    12px;
+
+  font-weight:
+    900;
+}
+
+
+/* =========================================================
+   Board
+   ========================================================= */
+
+.board {
+  width:
+    min(
+      100%,
+      500px
+    );
+
+  aspect-ratio:
+    1 / 1;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      10,
+      1fr
+    );
+
+  grid-template-rows:
+    repeat(
+      10,
+      1fr
+    );
+
+  gap:
+    3px;
+
+  margin:
+    0 auto;
+}
+
+
+.cell {
+  min-width:
+    0;
+
+  min-height:
+    0;
+
+  aspect-ratio:
+    1 / 1;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  border-radius:
+    5px;
+
+  background:
+    var(--cell);
+
+  color:
+    var(--text);
+
+  cursor:
+    pointer;
+
+  padding:
+    0;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  font-weight:
+    900;
+
+  font-size:
+    clamp(
+      11px,
+      1.6vw,
+      20px
+    );
+
+  position:
+    relative;
+}
+
+
+.cell:hover:not(:disabled) {
+  background:
+    var(--cell-hover);
+
+  border-color:
+    rgba(81, 181, 255, 0.5);
+}
+
+
+.cell:disabled {
+  opacity:
+    1;
+
+  cursor:
+    default;
+}
+
+
+.cell.ship {
+  background:
+    linear-gradient(
+      145deg,
+      #6f8ca9,
+      #435f7d
+    );
+
+  border-color:
+    rgba(190, 220, 255, 0.5);
+}
+
+
+/* =========================================================
+   HIT
+   ========================================================= */
+
+.cell.hit {
+  background:
+    linear-gradient(
+      145deg,
+      #a83242,
+      #681b26
+    );
+
+  border-color:
+    #ff8b98;
+
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(255, 255, 255, 0.08);
+}
+
+
+.cell.hit::after {
+  content:
+    "";
+
+  width:
+    34%;
+
+  height:
+    34%;
+
+  border-radius:
+    50%;
+
+  background:
+    #ff7a87;
+
+  box-shadow:
+    0 0 10px
+    rgba(255, 83, 104, 0.55);
+
+  position:
+    absolute;
+}
+
+
+/* 如果格子上有 Radar 數字，
+   不要讓紅色圓點遮住數字 */
+.cell.radar-center.hit::after {
+  display:
+    none;
+}
+
+
+/* =========================================================
+   MISS
+   ========================================================= */
+
+.cell.miss {
+  background:
+    #070b10;
+
+  border-color:
+    #26384c;
+}
+
+
+.cell.miss::after {
+  content:
+    "";
+
+  width:
+    20%;
+
+  height:
+    20%;
+
+  border-radius:
+    50%;
+
+  background:
+    #708399;
+
+  position:
+    absolute;
+}
+
+
+/* Radar 有數字時不畫灰點 */
+.cell.radar-center.miss::after {
+  display:
+    none;
+}
+
+
+/* =========================================================
+   Radar
+   ========================================================= */
+
+
+/*
+  狀態 1：
+  Radar 掃過，但是這個中心格還沒有被實際攻擊。
+
+  灰底 + 黃字。
+*/
+
+.cell.radar-center {
+  background:
+    #5f6b7a !important;
+
+  border-color:
+    #ffc857 !important;
+
+  color:
+    #ffd84d !important;
+
+  font-weight:
+    900;
+
+  font-size:
+    clamp(
+      14px,
+      2vw,
+      22px
+    );
+
+  box-shadow:
+    inset 0 0 0 2px
+    rgba(255, 200, 87, 0.72);
+}
+
+
+/*
+  狀態 2：
+  Radar 中心之後真的被攻擊，
+  而且那格有船。
+
+  紅底 + 黃字。
+*/
+
+.cell.hit.radar-center {
+  background:
+    linear-gradient(
+      145deg,
+      #a83242,
+      #681b26
+    ) !important;
+
+  border-color:
+    #ff8b98 !important;
+
+  color:
+    #ffd84d !important;
+
+  box-shadow:
+    inset 0 0 0 2px
+    rgba(255, 200, 87, 0.62);
+}
+
+
+/*
+  狀態 3：
+  Radar 中心之後真的被攻擊，
+  但那格沒有船。
+
+  黑底 + 黃字。
+*/
+
+.cell.miss.radar-center {
+  background:
+    #070b10 !important;
+
+  border-color:
+    #ffc857 !important;
+
+  color:
+    #ffd84d !important;
+
+  box-shadow:
+    inset 0 0 0 2px
+    rgba(255, 200, 87, 0.65);
+}
+
+
+/* =========================================================
+   Skill list
+   ========================================================= */
+
+.skill-list {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    12px;
+
+  margin-top:
+    24px;
+}
+
+
+.skill-card {
+  border:
+    1px solid
+    var(--border);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(28, 46, 72, 0.95),
+      rgba(16, 30, 48, 0.95)
+    );
+
+  border-radius:
+    16px;
+
+  padding:
+    14px;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    8px;
+}
+
+
+.skill-card strong {
+  font-size:
+    15px;
+}
+
+
+.skill-card span {
+  color:
+    var(--muted);
+
+  line-height:
+    1.45;
+
+  font-size:
+    13px;
+
+  flex:
+    1;
+}
+
+
+.skill-btn {
+  width:
+    100%;
+
+  border:
+    1px solid
+    rgba(81, 181, 255, 0.35);
+
+  background:
+    rgba(81, 181, 255, 0.1);
+
+  color:
+    #bde7ff;
+
+  border-radius:
+    10px;
+
+  padding:
+    10px;
+
+  font-weight:
+    800;
+
+  cursor:
+    pointer;
+}
+
+
+.skill-btn:hover:not(:disabled) {
+  background:
+    rgba(81, 181, 255, 0.2);
+}
+
+
+/* =========================================================
+   Modal：擊沉通知
+   ========================================================= */
+
+.modal-backdrop {
+  position:
+    fixed;
+
+  inset:
+    0;
+
+  z-index:
+    1000;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  background:
+    rgba(2, 6, 12, 0.78);
+
+  backdrop-filter:
+    blur(5px);
+}
+
+
+.modal-card {
+  width:
+    min(
+      440px,
+      90vw
+    );
+
+  text-align:
+    center;
+
+  background:
+    #111d30;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.16);
+
+  border-radius:
+    24px;
+
+  padding:
+    30px;
+
+  box-shadow:
+    0 28px 90px
+    rgba(0, 0, 0, 0.55);
+}
+
+
+.modal-icon {
+  font-size:
+    52px;
+
+  margin-bottom:
+    6px;
+}
+
+
+.modal-card h2 {
+  margin:
+    8px
+    0
+    10px;
+}
+
+
+.modal-card p {
+  color:
+    var(--muted);
+
+  font-size:
+    18px;
+
+  margin-bottom:
+    22px;
+}
+
+
+/* =========================================================
+   舊版 Result overlay
+   ========================================================= */
+
+.result-overlay {
+  position:
+    fixed;
+
+  inset:
+    0;
+
+  z-index:
+    2000;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  justify-content:
+    center;
+
+  align-items:
+    center;
+
+  text-align:
+    center;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(47, 130, 210, 0.28),
+      transparent 36%
+    ),
+    rgba(2, 6, 12, 0.96);
+}
+
+
 .result-word {
-  font-size: clamp(84px, 18vw, 220px);
-  line-height: .9;
-  font-weight: 1000;
-  letter-spacing: .06em;
-  text-shadow: 0 0 38px rgba(81,181,255,.35);
+  font-size:
+    clamp(
+      84px,
+      18vw,
+      220px
+    );
+
+  line-height:
+    0.9;
+
+  font-weight:
+    1000;
+
+  letter-spacing:
+    0.06em;
 }
-.result-word.lose {
-  color: #ff6b6b;
-  text-shadow: 0 0 38px rgba(255,107,107,.30);
-}
+
+
 .result-word.win {
-  color: #82e8ff;
+  color:
+    #82e8ff;
+
+  text-shadow:
+    0 0 38px
+    rgba(81, 181, 255, 0.35);
 }
+
+
+.result-word.lose {
+  color:
+    #ff6b6b;
+
+  text-shadow:
+    0 0 38px
+    rgba(255, 107, 107, 0.30);
+}
+
+
 .result-subtext {
-  margin-top: 28px;
-  color: #c9d7e8;
-  font-size: clamp(18px, 2.5vw, 28px);
+  margin-top:
+    28px;
+
+  color:
+    #c9d7e8;
+
+  font-size:
+    clamp(
+      18px,
+      2.5vw,
+      28px
+    );
 }
+
+
 .result-btn {
-  width: min(300px, 80vw);
-  margin-top: 34px;
+  width:
+    min(
+      300px,
+      80vw
+    );
+
+  margin-top:
+    34px;
+}
+
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (
+  max-width:
+  900px
+) {
+
+  .setup-layout {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .battle-layout {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .skill-list {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+}
+
+
+@media (
+  max-width:
+  560px
+) {
+
+  .screen {
+    width:
+      96vw;
+
+    padding-top:
+      18px;
+  }
+
+
+  .card {
+    padding:
+      16px;
+  }
+
+
+  .board-panel {
+    padding:
+      10px;
+  }
+
+
+  .board {
+    gap:
+      2px;
+  }
+
+
+  .cell {
+    border-radius:
+      3px;
+  }
+
+
+  .skill-list {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .room-input-row {
+    grid-template-columns:
+      1fr;
+  }
+
 }
