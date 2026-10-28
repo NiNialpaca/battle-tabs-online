@@ -33,14 +33,12 @@
   box-sizing: border-box;
 }
 
-
 html,
 body {
   margin: 0;
   padding: 0;
   min-height: 100%;
 }
-
 
 body {
   min-height: 100vh;
@@ -62,12 +60,10 @@ body {
     sans-serif;
 }
 
-
 button,
 input {
   font: inherit;
 }
-
 
 button {
   transition:
@@ -78,17 +74,14 @@ button {
     box-shadow 0.12s ease;
 }
 
-
 button:hover:not(:disabled) {
   transform: translateY(-1px);
 }
-
 
 button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
-
 
 .hidden {
   display: none !important;
@@ -105,7 +98,6 @@ button:disabled {
   padding: 32px 0 60px;
 }
 
-
 .card {
   background:
     linear-gradient(
@@ -114,19 +106,13 @@ button:disabled {
       rgba(12, 24, 40, 0.96)
     );
 
-  border:
-    1px solid
-    var(--border);
-
+  border: 1px solid var(--border);
   border-radius: 22px;
-
   padding: 24px;
 
   box-shadow:
-    0 20px 60px
-    rgba(0, 0, 0, 0.35);
+    0 20px 60px rgba(0, 0, 0, 0.35);
 }
-
 
 h1,
 h2,
@@ -134,29 +120,14 @@ h3 {
   margin-top: 0;
 }
 
-
 h1 {
-  font-size:
-    clamp(
-      36px,
-      7vw,
-      78px
-    );
-
-  letter-spacing:
-    -0.04em;
+  font-size: clamp(36px, 7vw, 78px);
+  letter-spacing: -0.04em;
 }
-
 
 h2 {
-  font-size:
-    clamp(
-      24px,
-      4vw,
-      38px
-    );
+  font-size: clamp(24px, 4vw, 38px);
 }
-
 
 p {
   color: var(--muted);
@@ -181,25 +152,18 @@ p {
   color: #05101c;
 
   font-weight: 900;
-
   border-radius: 12px;
 
-  padding:
-    13px
-    22px;
+  padding: 13px 22px;
 
   cursor: pointer;
 
   box-shadow:
-    0 10px 25px
-    rgba(81, 181, 255, 0.18);
+    0 10px 25px rgba(81, 181, 255, 0.18);
 }
 
-
 .secondary-btn {
-  border:
-    1px solid
-    var(--border);
+  border: 1px solid var(--border);
 
   background:
     rgba(255, 255, 255, 0.05);
@@ -208,21 +172,17 @@ p {
 
   border-radius: 12px;
 
-  padding:
-    12px
-    18px;
+  padding: 12px 18px;
 
   cursor: pointer;
 }
-
 
 .secondary-btn.active,
 .skill-btn.active {
   border-color: var(--warning);
 
   box-shadow:
-    0 0 0 2px
-    rgba(255, 200, 87, 0.22);
+    0 0 0 2px rgba(255, 200, 87, 0.22);
 }
 
 
@@ -234,78 +194,51 @@ p {
   min-height: 90vh;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 }
 
-
 .lobby-card {
-  width:
-    min(
-      620px,
-      94vw
-    );
-
+  width: min(620px, 94vw);
   text-align: center;
 }
 
-
 .room-actions {
   display: grid;
-
   gap: 14px;
-
   margin-top: 28px;
 }
 
-
 .room-input-row {
   display: grid;
-
-  grid-template-columns:
-    1fr auto;
-
+  grid-template-columns: 1fr auto;
   gap: 10px;
 }
-
 
 input {
   width: 100%;
 
   background: #07111f;
-
   color: var(--text);
 
-  border:
-    1px solid
-    var(--border);
-
+  border: 1px solid var(--border);
   border-radius: 12px;
 
-  padding:
-    13px
-    14px;
+  padding: 13px 14px;
 
   outline: none;
 }
-
 
 input:focus {
   border-color: var(--primary);
 
   box-shadow:
-    0 0 0 3px
-    rgba(81, 181, 255, 0.12);
+    0 0 0 3px rgba(81, 181, 255, 0.12);
 }
-
 
 .status-text {
   margin-top: 14px;
-
   min-height: 24px;
-
   color: var(--muted);
 }
 
@@ -317,12 +250,10 @@ input:focus {
 .room-code {
   display: inline-block;
 
-  padding:
-    8px 14px;
+  padding: 8px 14px;
 
   border:
-    1px solid
-    rgba(255, 200, 87, 0.45);
+    1px solid rgba(255, 200, 87, 0.45);
 
   background:
     rgba(255, 200, 87, 0.08);
@@ -332,7 +263,6 @@ input:focus {
   border-radius: 12px;
 
   font-weight: 900;
-
   letter-spacing: 0.15em;
 }
 
@@ -353,29 +283,21 @@ input:focus {
   align-items: start;
 }
 
-
 .setup-controls {
   display: flex;
-
   gap: 10px;
-
   flex-wrap: wrap;
 
   margin-bottom: 18px;
 }
 
-
 .ship-list {
   display: grid;
-
   gap: 12px;
 }
 
-
 .ship-card {
-  border:
-    1px solid
-    var(--border);
+  border: 1px solid var(--border);
 
   background:
     rgba(255, 255, 255, 0.035);
@@ -385,26 +307,20 @@ input:focus {
   padding: 14px;
 
   display: grid;
-
   gap: 6px;
 
   cursor: default;
 }
 
-
 .ship-card strong {
   font-size: 16px;
 }
 
-
 .ship-card span {
   color: var(--muted);
-
   font-size: 14px;
-
   line-height: 1.45;
 }
-
 
 .ship-card.current {
   border-color: var(--warning);
@@ -413,8 +329,7 @@ input:focus {
     rgba(255, 200, 87, 0.06);
 
   box-shadow:
-    0 0 0 2px
-    rgba(255, 200, 87, 0.15);
+    0 0 0 2px rgba(255, 200, 87, 0.15);
 
   cursor: pointer;
 }
@@ -426,9 +341,7 @@ input:focus {
 
 .battle-header {
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
   gap: 18px;
@@ -437,7 +350,6 @@ input:focus {
 
   margin-bottom: 24px;
 }
-
 
 .battle-layout {
   display: grid;
@@ -449,24 +361,18 @@ input:focus {
   gap: 30px;
 }
 
-
 .board-panel {
   background:
     rgba(255, 255, 255, 0.025);
 
-  border:
-    1px solid
-    var(--border);
-
+  border: 1px solid var(--border);
   border-radius: 20px;
 
   padding: 18px;
 }
 
-
 .board-title {
   margin-bottom: 12px;
-
   font-weight: 900;
 }
 
@@ -476,49 +382,35 @@ input:focus {
    ========================================================= */
 
 .board {
-  width:
-    min(
-      100%,
-      500px
-    );
+  width: min(100%, 500px);
 
   aspect-ratio: 1 / 1;
 
   display: grid;
 
   grid-template-columns:
-    repeat(
-      10,
-      1fr
-    );
+    repeat(10, 1fr);
 
   grid-template-rows:
-    repeat(
-      10,
-      1fr
-    );
+    repeat(10, 1fr);
 
   gap: 3px;
 
   margin: 0 auto;
 }
 
-
 .cell {
   min-width: 0;
-
   min-height: 0;
 
   aspect-ratio: 1 / 1;
 
   border:
-    1px solid
-    rgba(255, 255, 255, 0.08);
+    1px solid rgba(255, 255, 255, 0.08);
 
   border-radius: 5px;
 
   background: var(--cell);
-
   color: var(--text);
 
   cursor: pointer;
@@ -526,27 +418,19 @@ input:focus {
   padding: 0;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   font-weight: 900;
 
   font-size:
-    clamp(
-      11px,
-      1.6vw,
-      20px
-    );
+    clamp(11px, 1.6vw, 20px);
 
   position: relative;
 
   user-select: none;
-
   -webkit-user-select: none;
 }
-
 
 .cell:hover:not(:disabled) {
   background: var(--cell-hover);
@@ -555,10 +439,8 @@ input:focus {
     rgba(81, 181, 255, 0.5);
 }
 
-
 .cell:disabled {
   opacity: 1;
-
   cursor: default;
 }
 
@@ -581,13 +463,35 @@ input:focus {
 
 
 /* =========================================================
-   Setup selected ship
+   Setup drag / selection
    ========================================================= */
+
+#setupBoard .cell.ship {
+  cursor: grab;
+  touch-action: none;
+}
+
+#setupBoard .cell.ship:hover {
+  background:
+    linear-gradient(
+      145deg,
+      #7896b5,
+      #4d6d8f
+    );
+}
+
+#setupBoard .cell.ship:active {
+  cursor: grabbing;
+}
+
+
+/*
+  目前選中的船
+*/
 
 .cell.ship.selected-ship {
   outline:
-    3px solid
-    #ffc857;
+    3px solid #ffc857;
 
   outline-offset:
     -3px;
@@ -596,40 +500,41 @@ input:focus {
     #ffd84d;
 
   box-shadow:
-    inset 0 0 0 2px
-    rgba(255, 200, 87, 0.45),
-    0 0 14px
-    rgba(255, 200, 87, 0.35);
+    inset 0 0 0 2px rgba(255, 200, 87, 0.45),
+    0 0 16px rgba(255, 200, 87, 0.4);
 
   cursor: grab;
 
-  z-index: 4;
+  z-index: 5;
 }
-
 
 .cell.ship.selected-ship:hover {
   background:
     linear-gradient(
       145deg,
-      #7896b5,
-      #4a6888
+      #829fbc,
+      #526f90
     );
 }
-
 
 .cell.ship.selected-ship:active {
   cursor: grabbing;
 }
 
 
-/* 其他已部署但未選取的船也可以拖曳 */
-#setupBoard .cell.ship {
-  cursor: grab;
+/*
+  拖曳整艘船時
+*/
+
+body.dragging-ship {
+  cursor: grabbing !important;
+
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-
-#setupBoard .cell.ship:active {
-  cursor: grabbing;
+body.dragging-ship * {
+  cursor: grabbing !important;
 }
 
 
@@ -648,16 +553,13 @@ input:focus {
   border-color: #ff8b98;
 
   box-shadow:
-    inset 0 0 0 1px
-    rgba(255, 255, 255, 0.08);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
-
 
 .cell.hit::after {
   content: "";
 
   width: 34%;
-
   height: 34%;
 
   border-radius: 50%;
@@ -665,8 +567,7 @@ input:focus {
   background: #ff7a87;
 
   box-shadow:
-    0 0 10px
-    rgba(255, 83, 104, 0.55);
+    0 0 10px rgba(255, 83, 104, 0.55);
 
   position: absolute;
 }
@@ -682,12 +583,10 @@ input:focus {
   border-color: #26384c;
 }
 
-
 .cell.miss::after {
   content: "";
 
   width: 20%;
-
   height: 20%;
 
   border-radius: 50%;
@@ -699,11 +598,11 @@ input:focus {
 
 
 /* =========================================================
-   RADAR
+   Radar
    ========================================================= */
 
 /*
-  Radar 中心一定保留黃色數字。
+  Radar 中心一定顯示黃色數字
 */
 
 .cell.radar-center {
@@ -712,25 +611,21 @@ input:focus {
   font-weight: 900;
 
   font-size:
-    clamp(
-      14px,
-      2vw,
-      22px
-    );
+    clamp(14px, 2vw, 22px);
 
-  border-color: #ffc857 !important;
+  border-color:
+    #ffc857 !important;
 
   box-shadow:
-    inset 0 0 0 2px
-    rgba(255, 200, 87, 0.7);
+    inset 0 0 0 2px rgba(255, 200, 87, 0.7);
 
   z-index: 2;
 }
 
 
 /*
-  Radar 中心真的打到船
-  → 紅底 + 黃色數字
+  Radar 指定中心有船
+  → 紅底 + 黃字
 */
 
 .cell.hit.radar-center {
@@ -741,19 +636,20 @@ input:focus {
       #681b26
     ) !important;
 
-  border-color: #ff8b98 !important;
+  border-color:
+    #ff8b98 !important;
 
-  color: #ffd84d !important;
+  color:
+    #ffd84d !important;
 
   box-shadow:
-    inset 0 0 0 2px
-    rgba(255, 200, 87, 0.65);
+    inset 0 0 0 2px rgba(255, 200, 87, 0.65);
 }
 
 
 /*
-  Radar 中心沒有船
-  → 灰底 + 黃色數字
+  Radar 指定中心沒有船
+  → 灰底 + 黃字
 */
 
 .cell.miss.radar-center {
@@ -767,14 +663,12 @@ input:focus {
     #ffd84d !important;
 
   box-shadow:
-    inset 0 0 0 2px
-    rgba(255, 200, 87, 0.7);
+    inset 0 0 0 2px rgba(255, 200, 87, 0.7);
 }
 
 
 /*
-  Radar 中心有數字，
-  不要讓 HIT/MISS 原本的小圓點蓋掉。
+  Radar 數字不要被 hit / miss 圓點蓋住
 */
 
 .cell.hit.radar-center::after,
@@ -793,10 +687,7 @@ input:focus {
   grid-template-columns:
     repeat(
       4,
-      minmax(
-        0,
-        1fr
-      )
+      minmax(0, 1fr)
     );
 
   gap: 12px;
@@ -804,11 +695,9 @@ input:focus {
   margin-top: 24px;
 }
 
-
 .skill-card {
   border:
-    1px solid
-    var(--border);
+    1px solid var(--border);
 
   background:
     linear-gradient(
@@ -822,17 +711,14 @@ input:focus {
   padding: 14px;
 
   display: flex;
-
   flex-direction: column;
 
   gap: 8px;
 }
 
-
 .skill-card strong {
   font-size: 15px;
 }
-
 
 .skill-card span {
   color: var(--muted);
@@ -844,13 +730,11 @@ input:focus {
   flex: 1;
 }
 
-
 .skill-btn {
   width: 100%;
 
   border:
-    1px solid
-    rgba(81, 181, 255, 0.35);
+    1px solid rgba(81, 181, 255, 0.35);
 
   background:
     rgba(81, 181, 255, 0.1);
@@ -865,7 +749,6 @@ input:focus {
 
   cursor: pointer;
 }
-
 
 .skill-btn:hover:not(:disabled) {
   background:
@@ -891,49 +774,38 @@ input:focus {
   background:
     rgba(2, 6, 12, 0.78);
 
-  backdrop-filter: blur(5px);
+  backdrop-filter:
+    blur(5px);
 }
-
 
 .modal-card {
   width:
-    min(
-      440px,
-      90vw
-    );
+    min(440px, 90vw);
 
   text-align: center;
 
   background: #111d30;
 
   border:
-    1px solid
-    rgba(255, 255, 255, 0.16);
+    1px solid rgba(255, 255, 255, 0.16);
 
   border-radius: 24px;
 
   padding: 30px;
 
   box-shadow:
-    0 28px 90px
-    rgba(0, 0, 0, 0.55);
+    0 28px 90px rgba(0, 0, 0, 0.55);
 }
-
 
 .modal-icon {
   font-size: 52px;
-
   margin-bottom: 6px;
 }
 
-
 .modal-card h2 {
   margin:
-    8px
-    0
-    10px;
+    8px 0 10px;
 }
-
 
 .modal-card p {
   color: var(--muted);
@@ -960,7 +832,6 @@ input:focus {
   flex-direction: column;
 
   justify-content: center;
-
   align-items: center;
 
   text-align: center;
@@ -974,14 +845,9 @@ input:focus {
     rgba(2, 6, 12, 0.96);
 }
 
-
 .result-word {
   font-size:
-    clamp(
-      84px,
-      18vw,
-      220px
-    );
+    clamp(84px, 18vw, 220px);
 
   line-height: 0.9;
 
@@ -990,24 +856,19 @@ input:focus {
   letter-spacing: 0.06em;
 }
 
-
 .result-word.win {
   color: #82e8ff;
 
   text-shadow:
-    0 0 38px
-    rgba(81, 181, 255, 0.35);
+    0 0 38px rgba(81, 181, 255, 0.35);
 }
-
 
 .result-word.lose {
   color: #ff6b6b;
 
   text-shadow:
-    0 0 38px
-    rgba(255, 107, 107, 0.30);
+    0 0 38px rgba(255, 107, 107, 0.30);
 }
-
 
 .result-subtext {
   margin-top: 28px;
@@ -1015,20 +876,12 @@ input:focus {
   color: #c9d7e8;
 
   font-size:
-    clamp(
-      18px,
-      2.5vw,
-      28px
-    );
+    clamp(18px, 2.5vw, 28px);
 }
-
 
 .result-btn {
   width:
-    min(
-      300px,
-      80vw
-    );
+    min(300px, 80vw);
 
   margin-top: 34px;
 }
@@ -1038,76 +891,56 @@ input:focus {
    Responsive
    ========================================================= */
 
-@media (
-  max-width:
-  900px
-) {
+@media (max-width: 900px) {
 
   .setup-layout {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
-
 
   .battle-layout {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
-
 
   .skill-list {
     grid-template-columns:
       repeat(
         2,
-        minmax(
-          0,
-          1fr
-        )
+        minmax(0, 1fr)
       );
   }
+
 }
 
 
-@media (
-  max-width:
-  560px
-) {
+@media (max-width: 560px) {
 
   .screen {
     width: 96vw;
-
     padding-top: 18px;
   }
-
 
   .card {
     padding: 16px;
   }
 
-
   .board-panel {
     padding: 10px;
   }
-
 
   .board {
     gap: 2px;
   }
 
-
   .cell {
     border-radius: 3px;
   }
 
-
   .skill-list {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
-
 
   .room-input-row {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
+
 }
