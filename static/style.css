@@ -25,6 +25,10 @@
 }
 
 
+/* =========================================================
+   Base
+   ========================================================= */
+
 * {
   box-sizing: border-box;
 }
@@ -70,7 +74,8 @@ button {
     transform 0.12s ease,
     opacity 0.12s ease,
     background 0.12s ease,
-    border-color 0.12s ease;
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
 }
 
 
@@ -382,6 +387,8 @@ input:focus {
   display: grid;
 
   gap: 6px;
+
+  cursor: default;
 }
 
 
@@ -400,11 +407,16 @@ input:focus {
 
 
 .ship-card.current {
-  border-color: var(--primary);
+  border-color: var(--warning);
+
+  background:
+    rgba(255, 200, 87, 0.06);
 
   box-shadow:
     0 0 0 2px
-    rgba(81, 181, 255, 0.12);
+    rgba(255, 200, 87, 0.15);
+
+  cursor: pointer;
 }
 
 
@@ -529,6 +541,10 @@ input:focus {
     );
 
   position: relative;
+
+  user-select: none;
+
+  -webkit-user-select: none;
 }
 
 
@@ -547,6 +563,10 @@ input:focus {
 }
 
 
+/* =========================================================
+   Ship
+   ========================================================= */
+
 .cell.ship {
   background:
     linear-gradient(
@@ -557,6 +577,59 @@ input:focus {
 
   border-color:
     rgba(190, 220, 255, 0.5);
+}
+
+
+/* =========================================================
+   Setup selected ship
+   ========================================================= */
+
+.cell.ship.selected-ship {
+  outline:
+    3px solid
+    #ffc857;
+
+  outline-offset:
+    -3px;
+
+  border-color:
+    #ffd84d;
+
+  box-shadow:
+    inset 0 0 0 2px
+    rgba(255, 200, 87, 0.45),
+    0 0 14px
+    rgba(255, 200, 87, 0.35);
+
+  cursor: grab;
+
+  z-index: 4;
+}
+
+
+.cell.ship.selected-ship:hover {
+  background:
+    linear-gradient(
+      145deg,
+      #7896b5,
+      #4a6888
+    );
+}
+
+
+.cell.ship.selected-ship:active {
+  cursor: grabbing;
+}
+
+
+/* 其他已部署但未選取的船也可以拖曳 */
+#setupBoard .cell.ship {
+  cursor: grab;
+}
+
+
+#setupBoard .cell.ship:active {
+  cursor: grabbing;
 }
 
 
@@ -630,9 +703,8 @@ input:focus {
    ========================================================= */
 
 /*
-  Radar 中心一定有黃色數字。
+  Radar 中心一定保留黃色數字。
 */
-
 
 .cell.radar-center {
   color: #ffd84d !important;
@@ -657,9 +729,8 @@ input:focus {
 
 
 /*
-  Radar 指定中心格真的打到船：
-
-  紅底 + 黃色數字
+  Radar 中心真的打到船
+  → 紅底 + 黃色數字
 */
 
 .cell.hit.radar-center {
@@ -681,17 +752,19 @@ input:focus {
 
 
 /*
-  Radar 指定中心格沒有船：
-
-  灰底 + 黃色數字
+  Radar 中心沒有船
+  → 灰底 + 黃色數字
 */
 
 .cell.miss.radar-center {
-  background: #5f6b7a !important;
+  background:
+    #5f6b7a !important;
 
-  border-color: #ffc857 !important;
+  border-color:
+    #ffc857 !important;
 
-  color: #ffd84d !important;
+  color:
+    #ffd84d !important;
 
   box-shadow:
     inset 0 0 0 2px
@@ -700,8 +773,8 @@ input:focus {
 
 
 /*
-  Radar 中心有數字時，
-  不要讓 HIT / MISS 原本的小圓點遮住數字。
+  Radar 中心有數字，
+  不要讓 HIT/MISS 原本的小圓點蓋掉。
 */
 
 .cell.hit.radar-center::after,
@@ -801,7 +874,7 @@ input:focus {
 
 
 /* =========================================================
-   Modal：擊沉通知
+   Modal
    ========================================================= */
 
 .modal-backdrop {
@@ -992,7 +1065,6 @@ input:focus {
         )
       );
   }
-
 }
 
 
@@ -1038,5 +1110,4 @@ input:focus {
     grid-template-columns:
       1fr;
   }
-
 }
