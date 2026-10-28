@@ -33,7 +33,7 @@ const BOARD_SIZE = 10;
 
 
 // ======================================================
-// 全域狀態
+// WebSocket / 房間狀態
 // ======================================================
 
 let socket = null;
@@ -41,6 +41,9 @@ let socket = null;
 let roomCode = null;
 let playerId = null;
 let playerIndex = null;
+
+let reconnectTimer = null;
+let intentionalClose = false;
 
 
 // ======================================================
@@ -53,11 +56,15 @@ let setupShipIndex = 0;
 
 let direction = "horizontal";
 
-// 目前選到哪一艘已部署的船
+let setupLocked = false;
+
+// 目前選中的已部署船
 let selectedSetupShip = null;
 
-// 拖曳
+// 拖曳中的船
 let draggingShipIndex = null;
+
+// 抓住的是船的哪一格
 let dragOffsetRow = 0;
 let dragOffsetCol = 0;
 
@@ -69,15 +76,6 @@ let dragOffsetCol = 0;
 let latestState = null;
 
 let selectedSkill = null;
-
-
-// ======================================================
-// 重連
-// ======================================================
-
-let reconnectTimer = null;
-
-let intentionalClose = false;
 
 
 // ======================================================
@@ -108,10 +106,7 @@ function showScreen(name) {
     screen => {
 
       if (screen) {
-
-        screen.classList.add(
-          "hidden"
-        );
+        screen.classList.add("hidden");
       }
 
     }
@@ -162,13 +157,11 @@ function connectSocket(onOpen) {
           reconnectTimer
         );
 
-        reconnectTimer =
-          null;
+        reconnectTimer = null;
       }
 
 
       if (onOpen) {
-
         onOpen();
       }
     };
@@ -208,7 +201,6 @@ function connectSocket(onOpen) {
     () => {
 
       if (intentionalClose) {
-
         return;
       }
 
@@ -252,7 +244,7 @@ function connectSocket(onOpen) {
 
 
 // ======================================================
-// 自動重新連線
+// 自動重連
 // ======================================================
 
 function scheduleReconnect() {
@@ -271,7 +263,6 @@ function scheduleReconnect() {
 
 
   if (reconnectTimer) {
-
     return;
   }
 
@@ -280,8 +271,7 @@ function scheduleReconnect() {
     setTimeout(
       () => {
 
-        reconnectTimer =
-          null;
+        reconnectTimer = null;
 
 
         connectSocket(
@@ -308,7 +298,7 @@ function scheduleReconnect() {
 
 
 // ======================================================
-// 傳送資料
+// 傳訊息
 // ======================================================
 
 function send(
@@ -371,15 +361,15 @@ if (createRoomBtn) {
   createRoomBtn.onclick =
     () => {
 
-      const lobbyStatus =
+      const status =
         document.getElementById(
           "lobbyStatus"
         );
 
 
-      if (lobbyStatus) {
+      if (status) {
 
-        lobbyStatus.textContent =
+        status.textContent =
           "建立房間中...";
       }
 
@@ -419,7 +409,6 @@ if (joinRoomBtn) {
 
 
       if (!input) {
-
         return;
       }
 
@@ -434,15 +423,15 @@ if (joinRoomBtn) {
         code.length !== 4
       ) {
 
-        const lobbyStatus =
+        const status =
           document.getElementById(
             "lobbyStatus"
           );
 
 
-        if (lobbyStatus) {
+        if (status) {
 
-          lobbyStatus.textContent =
+          status.textContent =
             "請輸入 4 碼房間代碼。";
         }
 
@@ -451,15 +440,15 @@ if (joinRoomBtn) {
       }
 
 
-      const lobbyStatus =
+      const status =
         document.getElementById(
           "lobbyStatus"
         );
 
 
-      if (lobbyStatus) {
+      if (status) {
 
-        lobbyStatus.textContent =
+        status.textContent =
           "加入房間中...";
       }
 
@@ -482,7 +471,7 @@ if (joinRoomBtn) {
 
 
 // ======================================================
-// Server 訊息
+// 處理 Server 訊息
 // ======================================================
 
 function handleMessage(msg) {
@@ -550,7 +539,6 @@ function handleMessage(msg) {
 
     beginSetup();
 
-
     return;
   }
 
@@ -571,7 +559,7 @@ function handleMessage(msg) {
 
 
   // ====================================================
-  // 重連
+  // 重連成功
   // ====================================================
 
   if (
@@ -631,7 +619,7 @@ function handleMessage(msg) {
 
 
   // ====================================================
-  // 對手連線訊息
+  // 對手斷線 / 重連
   // ====================================================
 
   if (
@@ -659,7 +647,7 @@ function handleMessage(msg) {
 
 
   // ====================================================
-  // 擊沉通知
+  // 擊沉
   // ====================================================
 
   if (
@@ -683,7 +671,7 @@ function handleMessage(msg) {
 
 
   // ====================================================
-  // Game over
+  // 遊戲結束
   // ====================================================
 
   if (
@@ -719,15 +707,15 @@ function handleMessage(msg) {
       "setup"
     ) {
 
-      const setupStatus =
+      const status =
         document.getElementById(
           "setupStatus"
         );
 
 
-      if (setupStatus) {
+      if (status) {
 
-        setupStatus.textContent =
+        status.textContent =
           msg.state.both_ready
             ?
             "雙方已準備完成"
@@ -746,7 +734,6 @@ function handleMessage(msg) {
       showScreen(
         "battle"
       );
-
 
       renderBattle();
     }
@@ -780,7 +767,6 @@ function handleMessage(msg) {
     alert(
       msg.message
     );
-
 
     return;
   }
@@ -828,20 +814,28 @@ function beginSetup() {
 
   setupShipIndex = 0;
 
+  setupLocked = false;
+
   selectedSetupShip = null;
 
   draggingShipIndex = null;
 
+  dragOffsetRow = 0;
+
+  dragOffsetCol = 0;
+
   direction =
     "horizontal";
 
+
+  updateDirectionButtons();
 
   renderSetup();
 }
 
 
 // ======================================================
-// 棋盤工具
+// 基本棋盤工具
 // ======================================================
 
 function key(
@@ -878,7 +872,6 @@ function renderBoard(
 ) {
 
   if (!container) {
-
     return;
   }
 
@@ -943,7 +936,7 @@ function renderBoard(
 
 
 // ======================================================
-// 找棋盤格 DOM
+// 找棋盤格
 // ======================================================
 
 function getBoardCell(
@@ -976,7 +969,7 @@ function getBoardCell(
 
 
 // ======================================================
-// 計算新船位置
+// 建立一艘船的格子
 // ======================================================
 
 function buildShipCells(
@@ -1041,7 +1034,7 @@ function buildShipCells(
 
 
 // ======================================================
-// 目前船方向
+// 判斷已放船方向
 // ======================================================
 
 function getPlacedShipDirection(
@@ -1085,7 +1078,7 @@ function getPlacedShipDirection(
 
 
 // ======================================================
-// 是否會跟其他船重疊
+// 碰撞檢查
 // ======================================================
 
 function hasSetupCollision(
@@ -1135,7 +1128,7 @@ function hasSetupCollision(
 
 
 // ======================================================
-// 顯示部署
+// 部署畫面
 // ======================================================
 
 function renderSetup() {
@@ -1147,12 +1140,14 @@ function renderSetup() {
 
 
   if (!board) {
-
     return;
   }
 
 
+  // ====================================================
   // 先畫空棋盤
+  // ====================================================
+
   renderBoard(
     board,
     tryPlaceShip
@@ -1160,78 +1155,7 @@ function renderSetup() {
 
 
   // ====================================================
-  // 讓每個空格都可以接收拖曳
-  // ====================================================
-
-  [
-    ...board.children
-  ].forEach(
-    cell => {
-
-      cell.ondragover =
-        event => {
-
-          if (
-            draggingShipIndex
-            ===
-            null
-          ) {
-
-            return;
-          }
-
-
-          event.preventDefault();
-        };
-
-
-      cell.ondrop =
-        event => {
-
-          event.preventDefault();
-
-
-          if (
-            draggingShipIndex
-            ===
-            null
-          ) {
-
-            return;
-          }
-
-
-          const dropRow =
-            Number(
-              cell.dataset.row
-            );
-
-
-          const dropCol =
-            Number(
-              cell.dataset.col
-            );
-
-
-          moveSetupShip(
-            draggingShipIndex,
-            dropRow - dragOffsetRow,
-            dropCol - dragOffsetCol
-          );
-
-
-          draggingShipIndex =
-            null;
-
-
-          renderSetup();
-        };
-    }
-  );
-
-
-  // ====================================================
-  // 顯示已放的船
+  // 顯示所有船
   // ====================================================
 
   setupShips.forEach(
@@ -1261,7 +1185,6 @@ function renderSetup() {
 
 
           if (!cell) {
-
             return;
           }
 
@@ -1272,9 +1195,9 @@ function renderSetup() {
 
 
           if (
-            shipIndex
-            ===
             selectedSetupShip
+            ===
+            shipIndex
           ) {
 
             cell.classList.add(
@@ -1283,22 +1206,28 @@ function renderSetup() {
           }
 
 
-          // 這格屬於哪艘船
-          cell.dataset.shipIndex =
-            shipIndex;
+          // ==================================================
+          // 確認部署後不能再調整
+          // ==================================================
 
+          if (setupLocked) {
 
-          // 可以拖
-          cell.draggable =
-            true;
+            cell.onclick = null;
+
+            cell.onpointerdown = null;
+
+            return;
+          }
 
 
           // ==================================================
-          // 點一下選中船
+          // 點一下選船
           // ==================================================
 
           cell.onclick =
             event => {
+
+              event.preventDefault();
 
               event.stopPropagation();
 
@@ -1315,17 +1244,26 @@ function renderSetup() {
 
               updateDirectionButtons();
 
-
               renderSetup();
             };
 
 
           // ==================================================
-          // Drag start
+          // 開始拖曳
           // ==================================================
 
-          cell.ondragstart =
+          cell.onpointerdown =
             event => {
+
+              if (setupLocked) {
+                return;
+              }
+
+
+              event.preventDefault();
+
+              event.stopPropagation();
+
 
               selectedSetupShip =
                 shipIndex;
@@ -1333,6 +1271,12 @@ function renderSetup() {
 
               draggingShipIndex =
                 shipIndex;
+
+
+              direction =
+                getPlacedShipDirection(
+                  ship
+                );
 
 
               const [
@@ -1344,37 +1288,20 @@ function renderSetup() {
                   .map(Number);
 
 
+              // 抓住船哪一格
               dragOffsetRow =
                 row - firstRow;
-
 
               dragOffsetCol =
                 col - firstCol;
 
 
-              if (
-                event.dataTransfer
-              ) {
-
-                event.dataTransfer.effectAllowed =
-                  "move";
+              updateDirectionButtons();
 
 
-                event.dataTransfer.setData(
-                  "text/plain",
-                  String(
-                    shipIndex
-                  )
-                );
-              }
-            };
-
-
-          cell.ondragend =
-            () => {
-
-              draggingShipIndex =
-                null;
+              document.body.classList.add(
+                "dragging-ship"
+              );
             };
         }
       );
@@ -1432,6 +1359,21 @@ function renderSetup() {
         }
 
 
+        let stateText =
+          "尚未部署";
+
+
+        if (placed) {
+
+          stateText =
+            setupLocked
+              ?
+              "已鎖定"
+              :
+              "已部署，可拖曳調整";
+        }
+
+
         card.innerHTML = `
           <strong>
             ${shipType.name}
@@ -1443,18 +1385,16 @@ function renderSetup() {
           </span>
 
           <span>
-            ${
-              placed
-                ?
-                "已部署，可拖曳調整"
-                :
-                "尚未部署"
-            }
+            ${stateText}
           </span>
         `;
 
 
-        if (placed) {
+        if (
+          placed
+          &&
+          !setupLocked
+        ) {
 
           card.onclick =
             () => {
@@ -1471,7 +1411,6 @@ function renderSetup() {
 
               updateDirectionButtons();
 
-
               renderSetup();
             };
         }
@@ -1486,7 +1425,37 @@ function renderSetup() {
 
 
   // ====================================================
-  // 確認按鈕
+  // 水平垂直按鈕
+  // ====================================================
+
+  const horizontal =
+    document.getElementById(
+      "horizontalBtn"
+    );
+
+
+  const vertical =
+    document.getElementById(
+      "verticalBtn"
+    );
+
+
+  if (horizontal) {
+
+    horizontal.disabled =
+      setupLocked;
+  }
+
+
+  if (vertical) {
+
+    vertical.disabled =
+      setupLocked;
+  }
+
+
+  // ====================================================
+  // 確認部署
   // ====================================================
 
   const confirm =
@@ -1500,13 +1469,15 @@ function renderSetup() {
     confirm.disabled =
       setupShips.length
       !==
-      SHIP_TYPES.length;
+      SHIP_TYPES.length
+      ||
+      setupLocked;
   }
 }
 
 
 // ======================================================
-// 初次放船
+// 放新船
 // ======================================================
 
 function tryPlaceShip(
@@ -1514,7 +1485,22 @@ function tryPlaceShip(
   col
 ) {
 
-  // 已經四艘都放完
+  if (setupLocked) {
+    return;
+  }
+
+
+  // 正在拖船，不要同時新增船
+  if (
+    draggingShipIndex
+    !==
+    null
+  ) {
+
+    return;
+  }
+
+
   if (
     setupShips.length
     >=
@@ -1580,12 +1566,22 @@ function tryPlaceShip(
     setupShips.length - 1;
 
 
+  direction =
+    getPlacedShipDirection(
+      setupShips[
+        selectedSetupShip
+      ]
+    );
+
+
+  updateDirectionButtons();
+
   renderSetup();
 }
 
 
 // ======================================================
-// 拖曳移動船
+// 移動已放的船
 // ======================================================
 
 function moveSetupShip(
@@ -1594,6 +1590,11 @@ function moveSetupShip(
   startCol
 ) {
 
+  if (setupLocked) {
+    return false;
+  }
+
+
   const ship =
     setupShips[
       shipIndex
@@ -1601,7 +1602,6 @@ function moveSetupShip(
 
 
   if (!ship) {
-
     return false;
   }
 
@@ -1616,7 +1616,6 @@ function moveSetupShip(
 
 
   if (!definition) {
-
     return false;
   }
 
@@ -1666,6 +1665,128 @@ function moveSetupShip(
 
 
 // ======================================================
+// 全域 pointerup：拖船真正放下
+// ======================================================
+
+document.addEventListener(
+  "pointerup",
+  event => {
+
+    if (
+      setupLocked
+      ||
+      draggingShipIndex
+      ===
+      null
+    ) {
+
+      return;
+    }
+
+
+    const currentDraggingIndex =
+      draggingShipIndex;
+
+
+    draggingShipIndex =
+      null;
+
+
+    document.body.classList.remove(
+      "dragging-ship"
+    );
+
+
+    const board =
+      document.getElementById(
+        "setupBoard"
+      );
+
+
+    if (!board) {
+
+      renderSetup();
+
+      return;
+    }
+
+
+    const element =
+      document.elementFromPoint(
+        event.clientX,
+        event.clientY
+      );
+
+
+    if (!element) {
+
+      renderSetup();
+
+      return;
+    }
+
+
+    const cell =
+      element.closest(
+        ".cell"
+      );
+
+
+    if (
+      !cell
+      ||
+      !board.contains(
+        cell
+      )
+    ) {
+
+      renderSetup();
+
+      return;
+    }
+
+
+    const targetRow =
+      Number(
+        cell.dataset.row
+      );
+
+
+    const targetCol =
+      Number(
+        cell.dataset.col
+      );
+
+
+    moveSetupShip(
+      currentDraggingIndex,
+      targetRow - dragOffsetRow,
+      targetCol - dragOffsetCol
+    );
+
+
+    renderSetup();
+  }
+);
+
+
+// 如果滑鼠離開視窗，也結束拖曳
+window.addEventListener(
+  "blur",
+  () => {
+
+    draggingShipIndex =
+      null;
+
+
+    document.body.classList.remove(
+      "dragging-ship"
+    );
+  }
+);
+
+
+// ======================================================
 // 旋轉船
 // ======================================================
 
@@ -1674,6 +1795,11 @@ function rotateSetupShip(
   newDirection
 ) {
 
+  if (setupLocked) {
+    return false;
+  }
+
+
   const ship =
     setupShips[
       shipIndex
@@ -1681,7 +1807,6 @@ function rotateSetupShip(
 
 
   if (!ship) {
-
     return false;
   }
 
@@ -1696,7 +1821,6 @@ function rotateSetupShip(
 
 
   if (!definition) {
-
     return false;
   }
 
@@ -1757,7 +1881,7 @@ function rotateSetupShip(
 
 
 // ======================================================
-// 更新方向按鈕外觀
+// 更新方向按鈕
 // ======================================================
 
 function updateDirectionButtons() {
@@ -1812,6 +1936,11 @@ if (horizontalBtn) {
   horizontalBtn.onclick =
     () => {
 
+      if (setupLocked) {
+        return;
+      }
+
+
       direction =
         "horizontal";
 
@@ -1830,7 +1959,6 @@ if (horizontalBtn) {
 
 
       updateDirectionButtons();
-
 
       renderSetup();
     };
@@ -1852,6 +1980,11 @@ if (verticalBtn) {
   verticalBtn.onclick =
     () => {
 
+      if (setupLocked) {
+        return;
+      }
+
+
       direction =
         "vertical";
 
@@ -1871,14 +2004,13 @@ if (verticalBtn) {
 
       updateDirectionButtons();
 
-
       renderSetup();
     };
 }
 
 
 // ======================================================
-// 確認部署
+// 確認部署：從這一刻鎖死
 // ======================================================
 
 const confirmSetupBtn =
@@ -1893,6 +2025,8 @@ if (confirmSetupBtn) {
     () => {
 
       if (
+        setupLocked
+        ||
         setupShips.length
         !==
         SHIP_TYPES.length
@@ -1919,13 +2053,29 @@ if (confirmSetupBtn) {
 
 
       if (!sent) {
-
         return;
       }
 
 
-      confirmSetupBtn.disabled =
+      // =================================================
+      // 正式鎖定
+      // =================================================
+
+      setupLocked =
         true;
+
+
+      draggingShipIndex =
+        null;
+
+
+      selectedSetupShip =
+        null;
+
+
+      document.body.classList.remove(
+        "dragging-ship"
+      );
 
 
       const status =
@@ -1937,8 +2087,11 @@ if (confirmSetupBtn) {
       if (status) {
 
         status.textContent =
-          "已確認部署，等待對手...";
+          "部署已確認，不能再調整，等待對手...";
       }
+
+
+      renderSetup();
     };
 }
 
@@ -1954,20 +2107,19 @@ function renderBattle() {
 
 
   if (!state) {
-
     return;
   }
 
 
-  const battleRoomCode =
+  const roomDisplay =
     document.getElementById(
       "battleRoomCode"
     );
 
 
-  if (battleRoomCode) {
+  if (roomDisplay) {
 
-    battleRoomCode.textContent =
+    roomDisplay.textContent =
       roomCode;
   }
 
@@ -2035,7 +2187,7 @@ function renderBattle() {
 
 
   // ====================================================
-  // 自己的船
+  // 自己棋盤
   // ====================================================
 
   const ownShipCells =
@@ -2047,139 +2199,145 @@ function renderBattle() {
     );
 
 
-  [
-    ...ownBoard.children
-  ].forEach(
-    cell => {
+  if (ownBoard) {
 
-      const cellKey =
-        key(
-          Number(
-            cell.dataset.row
-          ),
-          Number(
-            cell.dataset.col
+    [
+      ...ownBoard.children
+    ].forEach(
+      cell => {
+
+        const cellKey =
+          key(
+            Number(
+              cell.dataset.row
+            ),
+            Number(
+              cell.dataset.col
+            )
+          );
+
+
+        if (
+          ownShipCells.has(
+            cellKey
           )
-        );
+        ) {
+
+          cell.classList.add(
+            "ship"
+          );
+        }
 
 
-      if (
-        ownShipCells.has(
-          cellKey
-        )
-      ) {
-
-        cell.classList.add(
-          "ship"
-        );
-      }
+        const attackState =
+          state.own_attacks[
+            cellKey
+          ];
 
 
-      const attackState =
-        state.own_attacks[
-          cellKey
-        ];
-
-
-      if (
-        attackState ===
-        "hit"
-      ) {
-
-        cell.classList.add(
+        if (
+          attackState ===
           "hit"
-        );
-      }
+        ) {
+
+          cell.classList.add(
+            "hit"
+          );
+        }
 
 
-      if (
-        attackState ===
-        "miss"
-      ) {
-
-        cell.classList.add(
+        if (
+          attackState ===
           "miss"
-        );
+        ) {
+
+          cell.classList.add(
+            "miss"
+          );
+        }
       }
-    }
-  );
+    );
+  }
 
 
   // ====================================================
   // 敵方棋盤
   // ====================================================
 
-  [
-    ...enemyBoard.children
-  ].forEach(
-    cell => {
+  if (enemyBoard) {
 
-      const cellKey =
-        key(
-          Number(
-            cell.dataset.row
-          ),
-          Number(
-            cell.dataset.col
-          )
-        );
+    [
+      ...enemyBoard.children
+    ].forEach(
+      cell => {
 
-
-      const attackState =
-        state.enemy_attacks[
-          cellKey
-        ];
+        const cellKey =
+          key(
+            Number(
+              cell.dataset.row
+            ),
+            Number(
+              cell.dataset.col
+            )
+          );
 
 
-      if (
-        attackState ===
-        "hit"
-      ) {
-
-        cell.classList.add(
-          "hit"
-        );
-      }
-
-
-      if (
-        attackState ===
-        "miss"
-      ) {
-
-        cell.classList.add(
-          "miss"
-        );
-      }
-
-
-      // Radar 中心黃色數字
-      if (
-        state.radar_numbers
-        &&
-        state.radar_numbers[
-          cellKey
-        ]
-        !==
-        undefined
-      ) {
-
-        cell.classList.add(
-          "radar-center"
-        );
-
-
-        cell.textContent =
-          state.radar_numbers[
+        const attackState =
+          state.enemy_attacks[
             cellKey
           ];
+
+
+        if (
+          attackState ===
+          "hit"
+        ) {
+
+          cell.classList.add(
+            "hit"
+          );
+        }
+
+
+        if (
+          attackState ===
+          "miss"
+        ) {
+
+          cell.classList.add(
+            "miss"
+          );
+        }
+
+
+        // Radar 中心
+        if (
+          state.radar_numbers
+          &&
+          state.radar_numbers[
+            cellKey
+          ]
+          !==
+          undefined
+        ) {
+
+          cell.classList.add(
+            "radar-center"
+          );
+
+
+          cell.textContent =
+            state.radar_numbers[
+              cellKey
+            ];
+        }
+
+
+        cell.disabled =
+          !state.is_your_turn;
       }
-
-
-      cell.disabled =
-        !state.is_your_turn;
-    }
-  );
+    );
+  }
 
 
   renderSkills(
@@ -2201,7 +2359,6 @@ function renderSkills(state) {
 
 
   if (!list) {
-
     return;
   }
 
@@ -2223,7 +2380,6 @@ function renderSkills(state) {
 
 
       if (!definition) {
-
         return;
       }
 
@@ -2303,7 +2459,7 @@ function renderSkills(state) {
         button.onclick =
           () => {
 
-            // Shield 不用選格子
+            // Shield 直接啟動
             if (
               ship.id
               ===
@@ -2396,13 +2552,9 @@ function onEnemyClick(
   col
 ) {
 
-  if (!latestState) {
-
-    return;
-  }
-
-
   if (
+    !latestState
+    ||
     !latestState.is_your_turn
   ) {
 
@@ -2424,10 +2576,7 @@ function onEnemyClick(
   }
 
 
-  // ====================================================
   // 技能
-  // ====================================================
-
   if (selectedSkill) {
 
     const sent =
@@ -2460,10 +2609,7 @@ function onEnemyClick(
   }
 
 
-  // ====================================================
-  // 普通攻擊
-  // ====================================================
-
+  // 普攻
   send(
     "attack",
     {
@@ -2518,12 +2664,15 @@ function showSunkModal(
     modalTitle.textContent =
       title;
 
+
     modalText.textContent =
       message;
+
 
     modal.classList.remove(
       "hidden"
     );
+
 
     return;
   }
@@ -2577,7 +2726,6 @@ function showResultOverlay(
 
 
   if (existing) {
-
     return;
   }
 
@@ -2719,6 +2867,7 @@ function showResultOverlay(
       intentionalClose =
         true;
 
+
       location.reload();
     };
 
@@ -2762,6 +2911,7 @@ if (resultBackBtn) {
       intentionalClose =
         true;
 
+
       location.reload();
     };
 }
@@ -2780,6 +2930,7 @@ if (backLobbyBtn) {
 
       intentionalClose =
         true;
+
 
       location.reload();
     };
