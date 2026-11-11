@@ -54,7 +54,8 @@ let setupShips = [];
 
 let setupShipIndex = 0;
 
-let direction = "horizontal";
+// 以第一個格子為旋轉軸，順時針角度依序為 0、90、180、270 度
+let direction = 0;
 
 let setupLocked = false;
 
@@ -825,7 +826,7 @@ function beginSetup() {
   dragOffsetCol = 0;
 
   direction =
-    "horizontal";
+    0;
 
 
   updateDirectionButtons();
@@ -989,24 +990,22 @@ function buildShipCells(
     i++
   ) {
 
-    const row =
-      shipDirection
-      ===
-      "vertical"
-        ?
-        startRow + i
-        :
-        startRow;
+    let row =
+      startRow;
+
+    let col =
+      startCol;
 
 
-    const col =
-      shipDirection
-      ===
-      "horizontal"
-        ?
-        startCol + i
-        :
-        startCol;
+    if (shipDirection === 90) {
+      row += i;
+    } else if (shipDirection === 180) {
+      col -= i;
+    } else if (shipDirection === 270) {
+      row -= i;
+    } else {
+      col += i;
+    }
 
 
     if (
@@ -1037,7 +1036,7 @@ function buildShipCells(
 // 判斷已放船方向
 // ======================================================
 
-function getPlacedShipDirection(
+function getPlacedShipRotation(
   ship
 ) {
 
@@ -1047,7 +1046,7 @@ function getPlacedShipDirection(
     ship.cells.length < 2
   ) {
 
-    return "horizontal";
+    return 0;
   }
 
 
@@ -1063,17 +1062,12 @@ function getPlacedShipDirection(
       .map(Number);
 
 
-  if (
-    first[0]
-    !==
-    second[0]
-  ) {
-
-    return "vertical";
+  if (first[0] === second[0]) {
+    return second[1] > first[1] ? 0 : 180;
   }
 
 
-  return "horizontal";
+  return second[0] > first[0] ? 90 : 270;
 }
 
 
@@ -1237,7 +1231,7 @@ function renderSetup() {
 
 
               direction =
-                getPlacedShipDirection(
+                getPlacedShipRotation(
                   ship
                 );
 
@@ -1274,7 +1268,7 @@ function renderSetup() {
 
 
               direction =
-                getPlacedShipDirection(
+                getPlacedShipRotation(
                   ship
                 );
 
@@ -1404,7 +1398,7 @@ function renderSetup() {
 
 
               direction =
-                getPlacedShipDirection(
+                getPlacedShipRotation(
                   setupShips[index]
                 );
 
@@ -1554,7 +1548,7 @@ function tryPlaceShip(
 
 
   direction =
-    getPlacedShipDirection(
+    getPlacedShipRotation(
       setupShips[
         selectedSetupShip
       ]
@@ -1608,7 +1602,7 @@ function moveSetupShip(
 
 
   const shipDirection =
-    getPlacedShipDirection(
+    getPlacedShipRotation(
       ship
     );
 
@@ -1882,11 +1876,7 @@ function updateDirectionButtons() {
   if (rotateButton) {
 
     rotateButton.textContent =
-      direction
-      ===
-      "horizontal"
-        ? "旋轉 90°（目前橫向）"
-        : "旋轉 90°（目前直向）";
+      `右轉 90°（目前 ${direction}°）`;
   }
 }
 
@@ -1912,11 +1902,7 @@ if (rotateBtn) {
 
 
       const nextDirection =
-        direction
-        ===
-        "horizontal"
-          ? "vertical"
-          : "horizontal";
+        (direction + 90) % 360;
 
 
       if (
