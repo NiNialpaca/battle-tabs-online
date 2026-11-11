@@ -534,7 +534,15 @@ input:focus {
   background-size: 200% 200%;
 
   filter:
-    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+    brightness(0)
+    saturate(100%)
+    invert(16%)
+    sepia(24%)
+    saturate(1700%)
+    hue-rotate(174deg)
+    brightness(84%)
+    contrast(112%)
+    drop-shadow(0 1px 2px rgba(255, 255, 255, 0.7));
 }
 
 .ship-logo--destroyer {
