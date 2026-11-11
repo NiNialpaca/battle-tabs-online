@@ -1648,18 +1648,29 @@ function renderSetup() {
 
 
         card.innerHTML = `
-          <strong>
-            ${shipType.name}
-          </strong>
+          <div class="ship-card-main">
+            <img
+              class="ship-card-sprite"
+              src="${shipType.sprite}"
+              alt="${shipType.name} 船隻"
+              draggable="false"
+            />
 
-          <span>
-            長度 ${shipType.size}
-            ｜${shipType.description}
-          </span>
+            <div class="ship-card-copy">
+              <strong>
+                ${shipType.name}
+              </strong>
 
-          <span>
-            ${stateText}
-          </span>
+              <span>
+                長度 ${shipType.size}
+                ｜${shipType.description}
+              </span>
+
+              <span>
+                ${stateText}
+              </span>
+            </div>
+          </div>
         `;
 
 

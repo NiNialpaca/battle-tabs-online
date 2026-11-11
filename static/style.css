@@ -312,6 +312,34 @@ input:focus {
   cursor: default;
 }
 
+.ship-card-main {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.ship-card-sprite {
+  width: 112px;
+  height: 58px;
+
+  flex: 0 0 112px;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(0 3px 5px rgba(0, 0, 0, 0.4));
+}
+
+.ship-card-copy {
+  min-width: 0;
+
+  display: grid;
+
+  gap: 6px;
+}
+
 .ship-card.used {
   opacity: 0.5;
 
