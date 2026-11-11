@@ -1200,10 +1200,10 @@ function renderShipSprites(
       );
 
       logo.style.width =
-        `${cellSize * 0.64}px`;
+        `${cellSize * 0.78}px`;
 
       logo.style.height =
-        `${cellSize * 0.64}px`;
+        `${cellSize * 0.78}px`;
 
       visual.appendChild(
         sprite
