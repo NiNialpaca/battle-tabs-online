@@ -431,6 +431,8 @@ input:focus {
   gap: 3px;
 
   margin: 0 auto;
+
+  position: relative;
 }
 
 .cell {
@@ -493,6 +495,61 @@ input:focus {
 
   border-color:
     rgba(190, 220, 255, 0.5);
+}
+
+.ship-visual {
+  position: absolute;
+
+  z-index: 4;
+
+  pointer-events: none;
+
+  transform-origin: center center;
+
+  user-select: none;
+}
+
+.ship-sprite {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: fill;
+}
+
+.ship-logo {
+  position: absolute;
+
+  left: 36%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  background-repeat: no-repeat;
+
+  background-size: 200% 200%;
+
+  filter:
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+}
+
+.ship-logo--destroyer {
+  background-position: 0 0;
+}
+
+.ship-logo--radar {
+  background-position: 100% 0;
+}
+
+.ship-logo--shield {
+  background-position: 0 100%;
+}
+
+.ship-logo--missile {
+  background-position: 100% 100%;
 }
 
 

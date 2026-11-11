@@ -4,28 +4,36 @@ const SHIP_TYPES = [
     name: "Destroyer",
     size: 2,
     cooldown: 3,
-    description: "指定中心格必炸，並隨機轟炸周圍最多 4 格。"
+    description: "指定中心格必炸，並隨機轟炸周圍最多 4 格。",
+    sprite: "/static/images/ships/destroyer.png",
+    logo: "/static/images/ships/character-line-logos.png"
   },
   {
     id: "radar",
     name: "Radar Ship",
     size: 3,
     cooldown: 3,
-    description: "掃描 3×3 區域，並攻擊指定的中心格。"
+    description: "掃描 3×3 區域，並攻擊指定的中心格。",
+    sprite: "/static/images/ships/radar.png",
+    logo: "/static/images/ships/character-line-logos.png"
   },
   {
     id: "shield",
     name: "Shield Ship",
     size: 3,
     cooldown: 4,
-    description: "啟動後，下一次攻擊會被轉移到鄰近格。"
+    description: "啟動後，下一次攻擊會被轉移到鄰近格。",
+    sprite: "/static/images/ships/shield.png",
+    logo: "/static/images/ships/character-line-logos.png"
   },
   {
     id: "missile",
     name: "Missile Ship",
     size: 4,
     cooldown: 4,
-    description: "十字攻擊中心與上下左右共 5 格。"
+    description: "十字攻擊中心與上下左右共 5 格。",
+    sprite: "/static/images/ships/missile.png",
+    logo: "/static/images/ships/character-line-logos.png"
   }
 ];
 
@@ -952,7 +960,9 @@ function getBoardCell(
 ) {
 
   return [
-    ...board.children
+    ...board.querySelectorAll(
+      ".cell"
+    )
   ].find(
     cell => {
 
@@ -968,6 +978,243 @@ function getBoardCell(
         )
         ===
         col
+      );
+    }
+  );
+}
+
+
+// ======================================================
+// 顯示角色船身
+// ======================================================
+
+function renderShipSprites(
+  board,
+  ships
+) {
+
+  if (
+    !board
+    ||
+    !ships
+  ) {
+    return;
+  }
+
+
+  const boardRect =
+    board.getBoundingClientRect();
+
+
+  ships.forEach(
+    ship => {
+
+      const definition =
+        SHIP_TYPES.find(
+          item =>
+            item.id
+            ===
+            ship.id
+        );
+
+
+      if (
+        !definition
+        ||
+        !definition.sprite
+        ||
+        !ship.cells
+        ||
+        !ship.cells.length
+      ) {
+        return;
+      }
+
+
+      const cells =
+        ship.cells.map(
+          cellKey => {
+            const [row, col] =
+              cellKey
+                .split(",")
+                .map(Number);
+
+            return getBoardCell(
+              board,
+              row,
+              col
+            );
+          }
+        ).filter(Boolean);
+
+
+      if (!cells.length) {
+        return;
+      }
+
+
+      const rects =
+        cells.map(
+          cell =>
+            cell.getBoundingClientRect()
+        );
+
+
+      const minLeft =
+        Math.min(
+          ...rects.map(
+            rect => rect.left
+          )
+        );
+
+
+      const minTop =
+        Math.min(
+          ...rects.map(
+            rect => rect.top
+          )
+        );
+
+
+      const maxRight =
+        Math.max(
+          ...rects.map(
+            rect => rect.right
+          )
+        );
+
+
+      const maxBottom =
+        Math.max(
+          ...rects.map(
+            rect => rect.bottom
+          )
+        );
+
+
+      const horizontalSpan =
+        Math.max(
+          maxRight - minLeft,
+          maxBottom - minTop
+        );
+
+
+      const cellSize =
+        rects[0].width;
+
+
+      const angle =
+        getPlacedShipRotation(
+          ship
+        );
+
+
+      const occupiedWidth =
+        angle % 180 === 0
+          ? horizontalSpan
+          : cellSize;
+
+
+      const occupiedHeight =
+        angle % 180 === 0
+          ? cellSize
+          : horizontalSpan;
+
+
+      const centerX =
+        minLeft
+        +
+        occupiedWidth / 2;
+
+
+      const centerY =
+        minTop
+        +
+        occupiedHeight / 2;
+
+
+      const visual =
+        document.createElement(
+          "div"
+        );
+
+
+      visual.className =
+        "ship-visual";
+
+      visual.style.left =
+        `${centerX - horizontalSpan / 2 - boardRect.left}px`;
+
+      visual.style.top =
+        `${centerY - cellSize / 2 - boardRect.top}px`;
+
+      visual.style.width =
+        `${horizontalSpan}px`;
+
+      visual.style.height =
+        `${cellSize}px`;
+
+      visual.style.transform =
+        `rotate(${angle}deg)`;
+
+
+      const sprite =
+        document.createElement(
+          "img"
+        );
+
+
+      sprite.className =
+        "ship-sprite";
+
+      sprite.src =
+        definition.sprite;
+
+      sprite.alt =
+        `${definition.name} character ship`;
+
+      sprite.draggable =
+        false;
+
+
+      const logo =
+        document.createElement(
+          "div"
+        );
+
+
+      logo.className =
+        `ship-logo ship-logo--${definition.id}`;
+
+      logo.style.backgroundImage =
+        `url("${definition.logo}")`;
+
+      logo.setAttribute(
+        "role",
+        "img"
+      );
+
+      logo.setAttribute(
+        "aria-label",
+        `${definition.name} logo`
+      );
+
+      logo.style.width =
+        `${cellSize * 0.78}px`;
+
+      logo.style.height =
+        `${cellSize * 0.78}px`;
+
+      visual.appendChild(
+        sprite
+      );
+
+      visual.appendChild(
+        logo
+      );
+
+      board.appendChild(
+        visual
       );
     }
   );
@@ -1305,6 +1552,12 @@ function renderSetup() {
         }
       );
     }
+  );
+
+
+  renderShipSprites(
+    board,
+    setupShips
   );
 
 
@@ -2250,6 +2503,12 @@ function renderBattle() {
       }
     );
   }
+
+
+  renderShipSprites(
+    ownBoard,
+    state.own_ships
+  );
 
 
   // ====================================================
