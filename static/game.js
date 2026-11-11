@@ -62,6 +62,9 @@ let setupLocked = false;
 // 目前選中的已部署船
 let selectedSetupShip = null;
 
+// 目前準備放置的船
+let selectedPlacementShipId = null;
+
 // 拖曳中的船
 let draggingShipIndex = null;
 
@@ -819,6 +822,8 @@ function beginSetup() {
 
   selectedSetupShip = null;
 
+  selectedPlacementShipId = null;
+
   draggingShipIndex = null;
 
   dragOffsetRow = 0;
@@ -1320,10 +1325,7 @@ function renderSetup() {
 
 
     SHIP_TYPES.forEach(
-      (
-        shipType,
-        index
-      ) => {
+      shipType => {
 
         const card =
           document.createElement(
@@ -1336,9 +1338,12 @@ function renderSetup() {
 
 
         const placed =
-          index
-          <
-          setupShips.length;
+          setupShips.some(
+            ship =>
+              ship.id
+              ===
+              shipType.id
+          );
 
 
         if (placed) {
@@ -1354,11 +1359,11 @@ function renderSetup() {
 
 
         if (
-          index
-          ===
-          selectedSetupShip
-          &&
           !placed
+          &&
+          selectedPlacementShipId
+          ===
+          shipType.id
         ) {
 
           card.classList.add(
@@ -1379,6 +1384,13 @@ function renderSetup() {
               "已鎖定"
               :
               "已使用（請點棋盤上的船調整）";
+        } else if (
+          selectedPlacementShipId
+          ===
+          shipType.id
+        ) {
+          stateText =
+            "準備放置";
         }
 
 
@@ -1396,6 +1408,24 @@ function renderSetup() {
             ${stateText}
           </span>
         `;
+
+
+        if (!placed && !setupLocked) {
+          card.onclick =
+            () => {
+              selectedPlacementShipId =
+                shipType.id;
+
+              selectedSetupShip =
+                null;
+
+              direction =
+                0;
+
+              updateDirectionButtons();
+              renderSetup();
+            };
+        }
 
 
         list.appendChild(
@@ -1481,9 +1511,21 @@ function tryPlaceShip(
 
 
   const shipType =
-    SHIP_TYPES[
-      setupShips.length
-    ];
+    SHIP_TYPES.find(
+      item =>
+        item.id
+        ===
+        selectedPlacementShipId
+    );
+
+
+  if (!shipType) {
+    alert(
+      "請先從艦隊清單選擇要放置的船"
+    );
+
+    return;
+  }
 
 
   const cells =
@@ -1529,6 +1571,9 @@ function tryPlaceShip(
 
   setupShipIndex =
     setupShips.length;
+
+  selectedPlacementShipId =
+    null;
 
 
   selectedSetupShip =
