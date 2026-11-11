@@ -1649,12 +1649,21 @@ function renderSetup() {
 
         card.innerHTML = `
           <div class="ship-card-main">
-            <img
-              class="ship-card-sprite"
-              src="${shipType.sprite}"
-              alt="${shipType.name} 船隻"
-              draggable="false"
-            />
+            <div class="ship-card-art">
+              <div
+                class="ship-card-logo ship-card-logo--${shipType.id}"
+                style="background-image: url('${shipType.logo}')"
+                role="img"
+                aria-label="${shipType.name} 角色 logo"
+              ></div>
+
+              <img
+                class="ship-card-sprite"
+                src="${shipType.sprite}"
+                alt="${shipType.name} 船隻"
+                draggable="false"
+              />
+            </div>
 
             <div class="ship-card-copy">
               <strong>

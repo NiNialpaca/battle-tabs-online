@@ -320,6 +320,54 @@ input:focus {
   gap: 12px;
 }
 
+.ship-card-art {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  flex: 0 0 168px;
+}
+
+.ship-card-logo {
+  width: 48px;
+  height: 48px;
+
+  flex: 0 0 48px;
+
+  background-repeat: no-repeat;
+  background-size: 200% 200%;
+
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(76%)
+    sepia(83%)
+    saturate(2047%)
+    hue-rotate(160deg)
+    brightness(104%)
+    contrast(104%)
+    drop-shadow(0 0 2px rgba(65, 225, 255, 0.98))
+    drop-shadow(0 0 5px rgba(65, 225, 255, 0.76));
+}
+
+.ship-card-logo--destroyer {
+  background-position: 0 0;
+}
+
+.ship-card-logo--radar {
+  background-position: 100% 0;
+}
+
+.ship-card-logo--shield {
+  background-position: 0 100%;
+}
+
+.ship-card-logo--missile {
+  background-position: 100% 100%;
+}
+
 .ship-card-sprite {
   width: 112px;
   height: 58px;
