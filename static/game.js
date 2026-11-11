@@ -1341,10 +1341,24 @@ function renderSetup() {
           setupShips.length;
 
 
+        if (placed) {
+          card.classList.add(
+            "used"
+          );
+
+          card.setAttribute(
+            "aria-disabled",
+            "true"
+          );
+        }
+
+
         if (
           index
           ===
           selectedSetupShip
+          &&
+          !placed
         ) {
 
           card.classList.add(
@@ -1364,7 +1378,7 @@ function renderSetup() {
               ?
               "已鎖定"
               :
-              "已部署，可拖曳調整";
+              "已使用（請點棋盤上的船調整）";
         }
 
 
@@ -1382,32 +1396,6 @@ function renderSetup() {
             ${stateText}
           </span>
         `;
-
-
-        if (
-          placed
-          &&
-          !setupLocked
-        ) {
-
-          card.onclick =
-            () => {
-
-              selectedSetupShip =
-                index;
-
-
-              direction =
-                getPlacedShipRotation(
-                  setupShips[index]
-                );
-
-
-              updateDirectionButtons();
-
-              renderSetup();
-            };
-        }
 
 
         list.appendChild(
