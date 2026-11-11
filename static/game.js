@@ -1425,31 +1425,18 @@ function renderSetup() {
 
 
   // ====================================================
-  // 水平垂直按鈕
+  // 旋轉按鈕
   // ====================================================
 
-  const horizontal =
+  const rotateButton =
     document.getElementById(
-      "horizontalBtn"
+      "rotateBtn"
     );
 
 
-  const vertical =
-    document.getElementById(
-      "verticalBtn"
-    );
+  if (rotateButton) {
 
-
-  if (horizontal) {
-
-    horizontal.disabled =
-      setupLocked;
-  }
-
-
-  if (vertical) {
-
-    vertical.disabled =
+    rotateButton.disabled =
       setupLocked;
   }
 
@@ -1886,54 +1873,37 @@ function rotateSetupShip(
 
 function updateDirectionButtons() {
 
-  const horizontal =
+  const rotateButton =
     document.getElementById(
-      "horizontalBtn"
+      "rotateBtn"
     );
 
 
-  const vertical =
-    document.getElementById(
-      "verticalBtn"
-    );
+  if (rotateButton) {
 
-
-  if (horizontal) {
-
-    horizontal.classList.toggle(
-      "active",
+    rotateButton.textContent =
       direction
       ===
       "horizontal"
-    );
-  }
-
-
-  if (vertical) {
-
-    vertical.classList.toggle(
-      "active",
-      direction
-      ===
-      "vertical"
-    );
+        ? "旋轉 90°（目前橫向）"
+        : "旋轉 90°（目前直向）";
   }
 }
 
 
 // ======================================================
-// 水平
+// 旋轉 90 度
 // ======================================================
 
-const horizontalBtn =
+const rotateBtn =
   document.getElementById(
-    "horizontalBtn"
+    "rotateBtn"
   );
 
 
-if (horizontalBtn) {
+if (rotateBtn) {
 
-  horizontalBtn.onclick =
+  rotateBtn.onclick =
     () => {
 
       if (setupLocked) {
@@ -1941,8 +1911,12 @@ if (horizontalBtn) {
       }
 
 
-      direction =
-        "horizontal";
+      const nextDirection =
+        direction
+        ===
+        "horizontal"
+          ? "vertical"
+          : "horizontal";
 
 
       if (
@@ -1951,54 +1925,21 @@ if (horizontalBtn) {
         null
       ) {
 
-        rotateSetupShip(
+        const rotated =
+          rotateSetupShip(
           selectedSetupShip,
-          "horizontal"
-        );
-      }
+            nextDirection
+          );
 
 
-      updateDirectionButtons();
-
-      renderSetup();
-    };
-}
-
-
-// ======================================================
-// 垂直
-// ======================================================
-
-const verticalBtn =
-  document.getElementById(
-    "verticalBtn"
-  );
-
-
-if (verticalBtn) {
-
-  verticalBtn.onclick =
-    () => {
-
-      if (setupLocked) {
-        return;
-      }
-
-
-      direction =
-        "vertical";
-
-
-      if (
-        selectedSetupShip
-        !==
-        null
-      ) {
-
-        rotateSetupShip(
-          selectedSetupShip,
-          "vertical"
-        );
+        if (!rotated) {
+          updateDirectionButtons();
+          renderSetup();
+          return;
+        }
+      } else {
+        direction =
+          nextDirection;
       }
 
 
