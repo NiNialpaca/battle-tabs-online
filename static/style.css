@@ -523,8 +523,9 @@ input:focus {
 .ship-logo {
   position: absolute;
 
-  left: 36%;
-  top: 50%;
+  /* 船尾的右下角，船身旋轉時會跟著整艘船一起轉 */
+  left: 84%;
+  top: 74%;
 
   transform: translate(-50%, -50%);
 

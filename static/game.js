@@ -1200,10 +1200,10 @@ function renderShipSprites(
       );
 
       logo.style.width =
-        `${cellSize * 0.78}px`;
+        `${cellSize * 0.48}px`;
 
       logo.style.height =
-        `${cellSize * 0.78}px`;
+        `${cellSize * 0.48}px`;
 
       visual.appendChild(
         sprite
@@ -1843,6 +1843,7 @@ function tryPlaceShip(
 
   updateDirectionButtons();
 
+  // 放置完成後立即重畫，讓船身與 logo 同步出現在棋盤上
   renderSetup();
 }
 
