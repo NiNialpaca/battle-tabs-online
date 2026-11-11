@@ -369,6 +369,32 @@ input:focus {
   gap: 30px;
 }
 
+.panel.your-turn-highlight {
+  border-color: var(--warning);
+
+  box-shadow:
+    0 0 0 2px rgba(255, 200, 87, 0.2),
+    0 0 24px rgba(255, 200, 87, 0.3);
+
+  animation:
+    your-turn-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes your-turn-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 2px rgba(255, 200, 87, 0.18),
+      0 0 18px rgba(255, 200, 87, 0.22);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(255, 200, 87, 0.38),
+      0 0 32px rgba(255, 200, 87, 0.46);
+  }
+}
+
 .board-panel {
   background:
     rgba(255, 255, 255, 0.025);

@@ -2122,6 +2122,38 @@ function renderBattle() {
   }
 
 
+  const enemyPanel =
+    document.getElementById(
+      "enemyPanel"
+    );
+
+
+  const skillPanel =
+    document.getElementById(
+      "skillPanel"
+    );
+
+
+  const yourTurn =
+    state.is_your_turn === true;
+
+
+  if (enemyPanel) {
+    enemyPanel.classList.toggle(
+      "your-turn-highlight",
+      yourTurn
+    );
+  }
+
+
+  if (skillPanel) {
+    skillPanel.classList.toggle(
+      "your-turn-highlight",
+      yourTurn
+    );
+  }
+
+
   const ownBoard =
     document.getElementById(
       "ownBoard"
