@@ -665,11 +665,11 @@ body[data-lineup="chiikawa"] .board::after { background-image: url('/static/imag
 
 .sea-wave-border {
   position: absolute;
-  left: -7%;
-  top: calc(100% - 42px);
-  width: 114%;
-  height: clamp(85px, 17vw, 145px);
-  background: center / contain no-repeat;
+  left: -24%;
+  top: calc(100% - 85px);
+  width: 148%;
+  height: clamp(125px, 25vw, 215px);
+  background: center / 100% auto no-repeat;
   z-index: 3;
   opacity: .7;
   pointer-events: none;
