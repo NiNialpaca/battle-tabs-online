@@ -663,24 +663,6 @@ body[data-lineup="chiikawa"] .board::after { background-image: url('/static/imag
   -webkit-user-select: none;
 }
 
-.sea-wave-border {
-  position: absolute;
-  left: -24%;
-  top: calc(100% - 85px);
-  width: 148%;
-  height: clamp(125px, 25vw, 215px);
-  background: center / 100% auto no-repeat;
-  z-index: 3;
-  opacity: .7;
-  pointer-events: none;
-}
-body[data-lineup="nailong"] .sea-wave-border {
-  background-image: url('/static/images/ships/waves-gold.png');
-}
-body[data-lineup="chiikawa"] .sea-wave-border {
-  background-image: url('/static/images/ships/waves-blue.png');
-}
-body[data-lineup] .board { margin-bottom: clamp(75px, 14vw, 130px); }
 
 .cell:hover:not(:disabled) {
   background: var(--cell-hover);
