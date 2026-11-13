@@ -948,6 +948,10 @@ function renderBoard(
   container.innerHTML =
     "";
 
+  const waves = document.createElement("div");
+  waves.className = "sea-wave-border";
+  waves.setAttribute("aria-hidden", "true");
+  container.appendChild(waves);
 
   for (
     let row = 0;

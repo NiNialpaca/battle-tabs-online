@@ -608,18 +608,19 @@ body[data-lineup] .board::before,
 body[data-lineup] .board::after {
   content: "";
   position: absolute;
-  width: clamp(42px, 12%, 80px);
+  width: clamp(52px, 14%, 100px);
   height: 80%;
   top: 8%;
   pointer-events: none;
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
-  opacity: .18;
+  opacity: .70;
+  filter: brightness(1.2) drop-shadow(0 0 5px rgba(170, 185, 155, .12));
   z-index: -1;
 }
 body[data-lineup] .board::before { right: calc(100% + 12px); transform: rotate(-8deg); }
-body[data-lineup] .board::after { left: calc(100% + 12px); transform: rotate(9deg) scaleY(-1); opacity: .12; }
+body[data-lineup] .board::after { left: calc(100% + 12px); transform: rotate(9deg) scaleY(-1); opacity: .70; }
 body[data-lineup="nailong"] .board::before,
 body[data-lineup="nailong"] .board::after { background-image: url('/static/images/ships/expedition-decor.svg'); }
 body[data-lineup="chiikawa"] .board::before,
@@ -661,6 +662,24 @@ body[data-lineup="chiikawa"] .board::after { background-image: url('/static/imag
   user-select: none;
   -webkit-user-select: none;
 }
+
+.sea-wave-border {
+  position: absolute;
+  left: -7%;
+  top: calc(100% + 8px);
+  width: 114%;
+  height: clamp(55px, 12vw, 110px);
+  background: center / contain no-repeat;
+  opacity: .7;
+  pointer-events: none;
+}
+body[data-lineup="nailong"] .sea-wave-border {
+  background-image: url('/static/images/ships/waves-gold.png');
+}
+body[data-lineup="chiikawa"] .sea-wave-border {
+  background-image: url('/static/images/ships/waves-blue.png');
+}
+body[data-lineup] .board { margin-bottom: clamp(75px, 14vw, 130px); }
 
 .cell:hover:not(:disabled) {
   background: var(--cell-hover);
