@@ -296,6 +296,21 @@ input:focus {
   gap: 12px;
 }
 
+.lineup-picker { margin-bottom: 24px; }
+.lineup-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.lineup-option { display: grid; gap: 10px; padding: 18px; text-align: left; border: 1px solid var(--border); border-radius: 14px; background: #152238; color: var(--text); cursor: pointer; }
+.lineup-option span { color: var(--muted); line-height: 1.6; }
+.lineup-option[aria-pressed="true"] { border-color: #49d9ef; box-shadow: 0 0 0 2px rgba(73,217,239,.25); }
+.lineup-option:disabled { cursor: default; opacity: .55; }
+.lineup-option[aria-pressed="true"]:disabled { opacity: 1; }
+body[data-lineup="nailong"] .ship-sprite,
+body[data-lineup="nailong"] .ship-card-sprite,
+body[data-lineup="nailong"] .ship-logo,
+body[data-lineup="nailong"] .ship-card-logo { background-size: 100% 100%; background-position: center; }
+body[data-lineup="nailong"] .ship-logo--radar,
+body[data-lineup="nailong"] .ship-logo--missile { left: 88%; }
+body[data-lineup="nailong"] .ship-logo--shield { left: 12%; }
+
 .ship-card {
   border: 1px solid var(--border);
 
@@ -621,12 +636,28 @@ input:focus {
   background-position: 0 0;
 }
 
+body[data-lineup="chiikawa"] .ship-sprite--destroyer {
+  transform: scale(1.2);
+  transform-origin: center bottom;
+}
+
 .ship-sprite--radar {
   background-position: 100% 0;
 }
 
 .ship-sprite--shield {
   background-position: 0 100%;
+}
+
+/* 圖集下排的船尾跨越象限邊界，遮住相鄰船露出的邊角。 */
+body[data-lineup="chiikawa"] .ship-sprite--shield,
+body[data-lineup="chiikawa"] .ship-card-sprite--shield {
+  clip-path: inset(0 5% 0 0);
+}
+
+body[data-lineup="chiikawa"] .ship-sprite--missile,
+body[data-lineup="chiikawa"] .ship-card-sprite--missile {
+  clip-path: inset(0 0 0 2%);
 }
 
 .ship-sprite--missile {

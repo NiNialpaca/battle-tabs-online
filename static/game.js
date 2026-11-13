@@ -39,6 +39,50 @@ const SHIP_TYPES = [
 
 const BOARD_SIZE = 10;
 
+const LINEUPS = [
+  { id: "nailong", name: "奶龍艦隊", characters: ["奶蛇", "奶蛋", "奶龍", "奶蛙"] },
+  { id: "chiikawa", name: "吉伊卡哇艦隊", characters: ["小八", "烏薩奇", "小桃", "吉一"] },
+  { id: "coming", name: "第三主題", characters: [], unavailable: true }
+];
+let selectedLineup = "chiikawa";
+
+function renderLineupPicker() {
+  document.body.dataset.lineup = selectedLineup;
+  const options = document.getElementById("lineupOptions");
+  if (!options) return;
+  options.replaceChildren();
+  LINEUPS.forEach(lineup => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "lineup-option";
+    button.setAttribute("aria-pressed", String(lineup.id === selectedLineup));
+    button.disabled = lineup.unavailable || setupLocked || setupShips.length > 0;
+    const title = document.createElement("strong");
+    title.textContent = lineup.name;
+    const detail = document.createElement("span");
+    detail.textContent = lineup.unavailable ? "即將推出" : lineup.characters.join(" ／ ");
+    button.append(title, detail);
+    button.onclick = () => {
+      selectedLineup = lineup.id;
+      selectedSetupShip = null;
+      selectedPlacementShipId = null;
+      SHIP_TYPES.forEach((ship, index) => {
+        ship.sprite = lineup.id === "nailong"
+          ? `/static/images/ships/${ship.id}.png`
+          : "/static/images/ships/character-ship-sprites.png";
+        ship.logo = lineup.id === "nailong"
+          ? `/static/images/ships/${ship.id}-logo.png`
+          : "/static/images/ships/character-line-logos.png";
+      });
+      renderSetup();
+    };
+    options.append(button);
+  });
+  document.getElementById("lineupStatus").textContent = setupShips.length || setupLocked
+    ? "陣容已套用，部署期間固定使用此陣容。"
+    : `目前陣容：${LINEUPS.find(item => item.id === selectedLineup).name}`;
+}
+
 
 // ======================================================
 // WebSocket / 房間狀態
@@ -1382,6 +1426,7 @@ function hasSetupCollision(
 // ======================================================
 
 function renderSetup() {
+  renderLineupPicker();
 
   const board =
     document.getElementById(

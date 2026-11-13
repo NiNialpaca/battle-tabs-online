@@ -38,6 +38,12 @@
     <section id="setupScreen" class="panel hidden">
       <div class="room-strip">房間 <span id="roomCodeTop"></span> ｜ <span id="playerLabel"></span></div>
       <h2>部署艦隊</h2>
+      <div class="lineup-picker" aria-label="選擇主題陣容">
+        <h3>選擇你的陣容</h3>
+        <p class="muted">每組包含四艘船，佔用 2／3／3／4 格。開始擺船前可自由切換。</p>
+        <div id="lineupOptions" class="lineup-options"></div>
+        <p id="lineupStatus" aria-live="polite"></p>
+      </div>
       <p class="muted">先從艦隊清單選擇船隻，再點擊棋盤放置。</p>
       <div class="setup-layout">
         <div>
