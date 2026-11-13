@@ -666,10 +666,11 @@ body[data-lineup="chiikawa"] .board::after { background-image: url('/static/imag
 .sea-wave-border {
   position: absolute;
   left: -7%;
-  top: calc(100% + 8px);
+  top: calc(100% - 42px);
   width: 114%;
-  height: clamp(55px, 12vw, 110px);
+  height: clamp(85px, 17vw, 145px);
   background: center / contain no-repeat;
+  z-index: 3;
   opacity: .7;
   pointer-events: none;
 }
