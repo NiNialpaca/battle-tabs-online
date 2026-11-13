@@ -374,10 +374,28 @@ input:focus {
 
   flex: 0 0 112px;
 
-  object-fit: contain;
+  background-repeat: no-repeat;
+
+  background-size: 200% 200%;
 
   filter:
     drop-shadow(0 3px 5px rgba(0, 0, 0, 0.4));
+}
+
+.ship-card-sprite--destroyer {
+  background-position: 0 0;
+}
+
+.ship-card-sprite--radar {
+  background-position: 100% 0;
+}
+
+.ship-card-sprite--shield {
+  background-position: 0 100%;
+}
+
+.ship-card-sprite--missile {
+  background-position: 100% 100%;
 }
 
 .ship-card-copy {
@@ -590,10 +608,25 @@ input:focus {
 
   inset: 0;
 
-  width: 100%;
-  height: 100%;
+  background-repeat: no-repeat;
 
-  object-fit: fill;
+  background-size: 200% 200%;
+}
+
+.ship-sprite--destroyer {
+  background-position: 0 0;
+}
+
+.ship-sprite--radar {
+  background-position: 100% 0;
+}
+
+.ship-sprite--shield {
+  background-position: 0 100%;
+}
+
+.ship-sprite--missile {
+  background-position: 100% 100%;
 }
 
 .ship-logo {

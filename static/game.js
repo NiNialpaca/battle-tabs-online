@@ -5,7 +5,7 @@ const SHIP_TYPES = [
     size: 2,
     cooldown: 3,
     description: "指定中心格必炸，並隨機轟炸周圍最多 4 格。",
-    sprite: "/static/images/ships/destroyer.png",
+    sprite: "/static/images/ships/character-ship-sprites.png",
     logo: "/static/images/ships/character-line-logos.png"
   },
   {
@@ -14,7 +14,7 @@ const SHIP_TYPES = [
     size: 3,
     cooldown: 3,
     description: "掃描 3×3 區域，並攻擊指定的中心格。",
-    sprite: "/static/images/ships/radar.png",
+    sprite: "/static/images/ships/character-ship-sprites.png",
     logo: "/static/images/ships/character-line-logos.png"
   },
   {
@@ -23,7 +23,7 @@ const SHIP_TYPES = [
     size: 3,
     cooldown: 4,
     description: "啟動後，下一次攻擊會被轉移到鄰近格。",
-    sprite: "/static/images/ships/shield.png",
+    sprite: "/static/images/ships/character-ship-sprites.png",
     logo: "/static/images/ships/character-line-logos.png"
   },
   {
@@ -32,7 +32,7 @@ const SHIP_TYPES = [
     size: 4,
     cooldown: 4,
     description: "十字攻擊中心與上下左右共 5 格。",
-    sprite: "/static/images/ships/missile.png",
+    sprite: "/static/images/ships/character-ship-sprites.png",
     logo: "/static/images/ships/character-line-logos.png"
   }
 ];
@@ -1160,21 +1160,25 @@ function renderShipSprites(
 
       const sprite =
         document.createElement(
-          "img"
+          "div"
         );
 
 
       sprite.className =
-        "ship-sprite";
+        `ship-sprite ship-sprite--${definition.id}`;
 
-      sprite.src =
-        definition.sprite;
+      sprite.style.backgroundImage =
+        `url("${definition.sprite}")`;
 
-      sprite.alt =
-        `${definition.name} character ship`;
+      sprite.setAttribute(
+        "role",
+        "img"
+      );
 
-      sprite.draggable =
-        false;
+      sprite.setAttribute(
+        "aria-label",
+        `${definition.name} character ship`
+      );
 
 
       const logo =
@@ -1657,12 +1661,12 @@ function renderSetup() {
                 aria-label="${shipType.name} 角色 logo"
               ></div>
 
-              <img
-                class="ship-card-sprite"
-                src="${shipType.sprite}"
-                alt="${shipType.name} 船隻"
-                draggable="false"
-              />
+              <div
+                class="ship-card-sprite ship-card-sprite--${shipType.id}"
+                style="background-image: url('${shipType.sprite}')"
+                role="img"
+                aria-label="${shipType.name} 船隻"
+              ></div>
             </div>
 
             <div class="ship-card-copy">
