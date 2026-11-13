@@ -307,9 +307,12 @@ body[data-lineup="nailong"] .ship-sprite,
 body[data-lineup="nailong"] .ship-card-sprite,
 body[data-lineup="nailong"] .ship-logo,
 body[data-lineup="nailong"] .ship-card-logo { background-size: 100% 100%; background-position: center; }
-body[data-lineup="nailong"] .ship-logo--radar,
-body[data-lineup="nailong"] .ship-logo--missile { left: 88%; }
-body[data-lineup="nailong"] .ship-logo--shield { left: 12%; }
+body[data-lineup="nailong"] .ship-logo--destroyer,
+body[data-lineup="nailong"] .ship-logo--radar { left: 88%; }
+body[data-lineup="nailong"] .ship-logo--shield,
+body[data-lineup="nailong"] .ship-logo--missile { left: 12%; }
+body[data-lineup="nailong"] .ship-sprite--missile,
+body[data-lineup="nailong"] .ship-card-sprite--missile { transform: scaleX(-1); }
 
 .ship-card {
   border: 1px solid var(--border);
