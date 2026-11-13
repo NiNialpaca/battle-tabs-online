@@ -637,7 +637,7 @@ body[data-lineup="nailong"] .ship-logo--shield { left: 12%; }
 }
 
 body[data-lineup="chiikawa"] .ship-sprite--destroyer {
-  transform: scale(1.2);
+  transform: scale(1.45);
   transform-origin: center bottom;
 }
 
