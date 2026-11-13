@@ -40,7 +40,7 @@ const SHIP_TYPES = [
 const BOARD_SIZE = 10;
 
 const LINEUPS = [
-  { id: "nailong", name: "奶龍艦隊", characters: ["奶蛇", "奶蛋", "奶龍", "奶蛙"] },
+  { id: "nailong", name: "奶龍艦隊", characters: ["奶蛋", "奶蛇", "奶龍", "奶蛙"] },
   { id: "chiikawa", name: "吉伊卡哇艦隊", characters: ["小八", "烏薩奇", "小桃", "吉一"] },
   { id: "coming", name: "第三主題", characters: [], unavailable: true }
 ];
@@ -77,11 +77,12 @@ function renderLineupPicker() {
       selectedSetupShip = null;
       selectedPlacementShipId = null;
       SHIP_TYPES.forEach((ship, index) => {
+        const assetId = { destroyer: "radar", radar: "destroyer" }[ship.id] || ship.id;
         ship.sprite = lineup.id === "nailong"
-          ? `/static/images/ships/${ship.id}.png?v=egg-expedition-2`
+          ? `/static/images/ships/${assetId}.png?v=egg-expedition-2`
           : "/static/images/ships/character-ship-sprites.png";
         ship.logo = lineup.id === "nailong"
-          ? `/static/images/ships/${ship.id}-logo.png`
+          ? `/static/images/ships/${assetId}-logo.png`
           : "/static/images/ships/character-line-logos.png";
       });
       renderSetup();

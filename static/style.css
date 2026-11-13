@@ -307,12 +307,19 @@ body[data-lineup="nailong"] .ship-sprite,
 body[data-lineup="nailong"] .ship-card-sprite,
 body[data-lineup="nailong"] .ship-logo,
 body[data-lineup="nailong"] .ship-card-logo { background-size: 100% 100%; background-position: center; }
-body[data-lineup="nailong"] .ship-logo--destroyer,
 body[data-lineup="nailong"] .ship-logo--radar { left: 88%; }
+body[data-lineup="nailong"] .ship-logo--destroyer { left: 12%; }
 body[data-lineup="nailong"] .ship-logo--shield,
 body[data-lineup="nailong"] .ship-logo--missile { left: 12%; }
-body[data-lineup="nailong"] .ship-sprite--missile,
-body[data-lineup="nailong"] .ship-card-sprite--missile { transform: scaleX(-1); }
+body[data-lineup="nailong"] .ship-logo--missile { left: 88%; }
+body[data-lineup="nailong"] .ship-sprite--destroyer,
+body[data-lineup="nailong"] .ship-card-sprite--destroyer { transform: scaleX(-1); }
+body[data-lineup="nailong"] .ship-sprite--radar { transform: scale(1.15); transform-origin: center bottom; }
+body[data-lineup="nailong"] .ship-sprite--missile { bottom: -12%; }
+body[data-lineup="nailong"] .ship-logo,
+body[data-lineup="nailong"] .ship-card-logo {
+  filter: drop-shadow(0 0 1px white) drop-shadow(0 0 2px rgba(65,225,255,.5));
+}
 
 .ship-card {
   border: 1px solid var(--border);
@@ -660,6 +667,14 @@ body[data-lineup="chiikawa"] .ship-card-sprite--shield {
 
 .ship-sprite--missile {
   background-position: 100% 100%;
+}
+
+/* 吉一船尾跨到圖集中央左側，擴大取圖範圍以保留完整船尾。 */
+body[data-lineup="chiikawa"] .ship-sprite--missile,
+body[data-lineup="chiikawa"] .ship-card-sprite--missile {
+  background-size: 188% 200%;
+  background-position: 100% 100%;
+  aspect-ratio: 100 / 47;
 }
 
 .ship-logo {
