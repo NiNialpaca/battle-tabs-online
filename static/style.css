@@ -60,6 +60,55 @@ body {
     sans-serif;
 }
 
+body[data-lineup="nailong"] {
+  --text: #fff4dc;
+  --muted: #c6b994;
+  --border: rgba(216, 169, 82, .3);
+  --cell: #243c3b;
+  --cell-hover: #365653;
+  --primary: #e5b45d;
+  background:
+    radial-gradient(ellipse at 12% 8%, rgba(213,151,57,.23), transparent 45%),
+    repeating-linear-gradient(0deg, transparent 0 79px, rgba(205,163,87,.035) 80px 81px),
+    repeating-linear-gradient(90deg, transparent 0 79px, rgba(205,163,87,.035) 80px 81px),
+    linear-gradient(145deg, #263b36, #122526 50%, #100f0b);
+  background-attachment: fixed;
+}
+
+body[data-lineup="chiikawa"] {
+  --text: #f4fbff;
+  --muted: #b5cbdf;
+  --border: rgba(164,211,239,.25);
+  --cell: #2b4862;
+  --cell-hover: #3e6280;
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(255,183,209,.2), transparent 43%),
+    radial-gradient(ellipse at 90% 18%, rgba(110,216,233,.24), transparent 48%),
+    repeating-radial-gradient(ellipse at 50% 130%, transparent 0 75px, rgba(184,226,246,.035) 76px 78px, transparent 79px 110px),
+    linear-gradient(160deg, #234562, #142d48 60%, #0b2034);
+  background-attachment: fixed;
+}
+
+body[data-lineup="nailong"] .panel,
+body[data-lineup="nailong"] .lineup-option {
+  background: rgba(24,35,31,.92);
+  border-color: rgba(216,169,82,.3);
+}
+
+body[data-lineup="chiikawa"] .panel,
+body[data-lineup="chiikawa"] .lineup-option {
+  background: rgba(22,44,67,.92);
+  border-color: rgba(164,211,239,.25);
+}
+
+body[data-lineup="nailong"] .board {
+  box-shadow: 0 0 35px rgba(213,151,57,.1);
+}
+
+body[data-lineup="chiikawa"] .board {
+  box-shadow: 0 0 35px rgba(110,216,233,.12);
+}
+
 button,
 input {
   font: inherit;
