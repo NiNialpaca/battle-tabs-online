@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 420" fill="none" stroke="#a4c8dc" stroke-width="3" stroke-linecap="round">
+<g transform="translate(80 80)">
+<circle r="48"/><circle r="28"/>
+<path d="M-12-46V-26M12-46V-26M-12 46V26M12 46V26M-46-12H-26M-46 12H-26M46-12H26M46 12H26" stroke="#c4a3b3"/>
+</g>
+<path d="M30 150Q125 135 120 195Q115 240 65 224Q28 207 50 190Q75 175 90 200Q110 240 43 270"/>
+<g transform="translate(80 330)">
+<circle cy="-36" r="9"/><path d="M0-27V37M-22-12H22M-42 6Q-40 38 0 42Q40 38 42 6M-42 6L-48 20M-42 6L-28 12M42 6L48 20M42 6L28 12"/>
+</g></svg>

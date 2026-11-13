@@ -584,6 +584,7 @@ body[data-lineup="nailong"] .ship-card-logo {
    ========================================================= */
 
 .board {
+  isolation: isolate;
   width: min(100%, 500px);
 
   aspect-ratio: 1 / 1;
@@ -601,6 +602,31 @@ body[data-lineup="nailong"] .ship-card-logo {
   margin: 0 auto;
 
   position: relative;
+}
+
+body[data-lineup] .board::before,
+body[data-lineup] .board::after {
+  content: "";
+  position: absolute;
+  width: clamp(42px, 12%, 80px);
+  height: 80%;
+  top: 8%;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  opacity: .18;
+  z-index: -1;
+}
+body[data-lineup] .board::before { right: calc(100% + 12px); transform: rotate(-8deg); }
+body[data-lineup] .board::after { left: calc(100% + 12px); transform: rotate(9deg) scaleY(-1); opacity: .12; }
+body[data-lineup="nailong"] .board::before,
+body[data-lineup="nailong"] .board::after { background-image: url('/static/images/ships/expedition-decor.svg'); }
+body[data-lineup="chiikawa"] .board::before,
+body[data-lineup="chiikawa"] .board::after { background-image: url('/static/images/ships/sailor-decor.svg'); }
+@media (max-width: 650px) {
+  body[data-lineup] .board::before,
+  body[data-lineup] .board::after { display: none; }
 }
 
 .cell {
