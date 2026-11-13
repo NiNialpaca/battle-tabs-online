@@ -48,7 +48,17 @@ let selectedLineup = "chiikawa";
 
 function renderLineupPicker() {
   document.body.dataset.lineup = selectedLineup;
-  const options = document.getElementById("lineupOptions");
+  let options = document.getElementById("lineupOptions");
+  if (!options) {
+    const screen = document.getElementById("setupScreen");
+    if (screen) {
+      const picker = document.createElement("div");
+      picker.className = "lineup-picker";
+      picker.innerHTML = '<h3>選擇你的陣容</h3><div id="lineupOptions" class="lineup-options"></div><p id="lineupStatus" aria-live="polite"></p>';
+      screen.querySelector(".setup-layout")?.before(picker);
+      options = document.getElementById("lineupOptions");
+    }
+  }
   if (!options) return;
   options.replaceChildren();
   LINEUPS.forEach(lineup => {
@@ -56,7 +66,7 @@ function renderLineupPicker() {
     button.type = "button";
     button.className = "lineup-option";
     button.setAttribute("aria-pressed", String(lineup.id === selectedLineup));
-    button.disabled = lineup.unavailable || setupLocked || setupShips.length > 0;
+    button.disabled = lineup.unavailable || setupLocked;
     const title = document.createElement("strong");
     title.textContent = lineup.name;
     const detail = document.createElement("span");
@@ -78,7 +88,7 @@ function renderLineupPicker() {
     };
     options.append(button);
   });
-  document.getElementById("lineupStatus").textContent = setupShips.length || setupLocked
+  document.getElementById("lineupStatus").textContent = setupLocked
     ? "陣容已套用，部署期間固定使用此陣容。"
     : `目前陣容：${LINEUPS.find(item => item.id === selectedLineup).name}`;
 }

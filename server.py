@@ -54,7 +54,8 @@ rooms = {}
 @app.get("/")
 def root():
     return FileResponse(
-        BASE / "static" / "index.html"
+        BASE / "static" / "index.html",
+        headers={"Cache-Control": "no-store"}
     )
 
 
