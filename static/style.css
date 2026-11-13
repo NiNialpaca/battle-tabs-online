@@ -606,7 +606,11 @@ input:focus {
 .ship-sprite {
   position: absolute;
 
-  inset: 0;
+  /* 每個圖集象限為 887 × 443.5，固定 2:1 比例並向上延伸。 */
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  aspect-ratio: 2 / 1;
 
   background-repeat: no-repeat;
 
@@ -661,17 +665,18 @@ input:focus {
 }
 
 .ship-logo--radar {
+  left: 12%;
+
   background-position: 100% 0;
 }
 
 .ship-logo--shield {
-  /* 奶龍船頭朝右，船尾在左側 */
-  left: 12%;
-
   background-position: 0 100%;
 }
 
 .ship-logo--missile {
+  left: 12%;
+
   background-position: 100% 100%;
 }
 
