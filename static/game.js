@@ -68,7 +68,7 @@ function renderLineupPicker() {
       selectedPlacementShipId = null;
       SHIP_TYPES.forEach((ship, index) => {
         ship.sprite = lineup.id === "nailong"
-          ? `/static/images/ships/${ship.id}.png`
+          ? `/static/images/ships/${ship.id}.png?v=egg-expedition-2`
           : "/static/images/ships/character-ship-sprites.png";
         ship.logo = lineup.id === "nailong"
           ? `/static/images/ships/${ship.id}-logo.png`
